@@ -1,14 +1,15 @@
 <h1 align="center">Tomorrowland Session Planner</h1>
 
 <p align="center">
-  <img src="https://your-image-url.com" alt="Tomorrowland Session Planner Logo">
+  [TMLSessionPlaner-Logo](https://github.com/Json-exe/TomorrowlandSessionPlanner/assets/96955704/0e6973a4-cc19-4247-a05e-967eafe6427a)
 </p>
 
 <p align="center">
   A TML Session Planner for viewing and planning sessions at the Tomorrowland Festival.
 </p>
 
-## Features
+## Features!
+
 
 - View sessions easily
 - Filter sessions by stage, DJ, and weekend
