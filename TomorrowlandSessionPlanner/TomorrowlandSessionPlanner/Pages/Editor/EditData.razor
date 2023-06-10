@@ -1,0 +1,89 @@
+﻿@page "/EditData"
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+
+@if (_loading)
+{
+    <MudGrid Justify="Justify.Center" Style="display: flex; align-items: center;">
+        <MudProgressCircular Size="Size.Large" Indeterminate="true"/>
+        <MudText Typo="Typo.h5">Loading Data...</MudText>
+    </MudGrid>
+}
+else
+{
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px; display: flex; justify-content: center; align-items: center;">
+                <MudText Align="Align.Center" Typo="Typo.h4">DJ Count: @_djList.Count</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px; display: flex; justify-content: center; align-items: center;">
+                <MudText Align="Align.Center" Typo="Typo.h4">Session Count: @_sessionList.Count</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px; display: flex; justify-content: center; align-items: center;">
+                <MudText Align="Align.Center" Typo="Typo.h4">Stage Count: @_stageList.Count</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudPaper Elevation="2" Class="pa-4">
+                <MudTable Items="_djList" Height="300px">
+                    <HeaderContent>
+                        <MudTh>DJ ID</MudTh>
+                        <MudTh>DJ Name</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="DJ ID">@context.id</MudTd>
+                        <MudTd DataLabel="DJ Name">@context.Name</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudPaper Elevation="2" Class="pa-4">
+                <MudTable Items="_stageList" Height="300px">
+                    <HeaderContent>
+                        <MudTh>Stage ID</MudTh>
+                        <MudTh>Stage Name</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Stage ID">@context.id</MudTd>
+                        <MudTd DataLabel="Stage Name">@context.Name</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Elevation="2" Class="pa-4">
+                <MudTable Items="_sessionList" Height="300px">
+                    <HeaderContent>
+                        <MudTh>Session ID</MudTh>
+                        <MudTh>Stage ID</MudTh>
+                        <MudTh>DJ ID</MudTh>
+                        <MudTh>Start Time</MudTh>
+                        <MudTh>End Time</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Session ID">@context.id</MudTd>
+                        <MudTd DataLabel="Stage ID">@context.StageId</MudTd>
+                        <MudTd DataLabel="DJ ID">@context.DJId</MudTd>
+                        <MudTd DataLabel="Start Time">@context.StartTime</MudTd>
+                        <MudTd DataLabel="End Time">@context.EndTime</MudTd>
+                    </RowTemplate>
+                </MudTable>
+                <MudGrid>
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="AddSession" Class="mt-2" StartIcon="@Icons.Material.Filled.Add">Add Session</MudButton>
+                    <MudSelect class="ml-2" @bind-Value="@_selectedStage" FullWidth="false" Variant="Variant.Outlined" Label="Pre-select Stage" Clearable="true">
+                        @foreach (var item in _stageList)
+                        {
+                            <MudSelectItem Value="@item.id">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudGrid>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+}

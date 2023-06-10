@@ -1,0 +1,44 @@
+﻿@page "/upload"
+@using TomorrowlandSessionPlanner.Code
+@inject PlannerManager PlannerManager
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudStack Justify="Justify.Center" Style="display: flex; align-items: center; height: 100%">
+    <MudText Align="Align.Center" GutterBottom="true" Typo="Typo.h3">Bitte Lade hier deine Plan Datei hoch!</MudText>
+    <MudPaper Outlined="true" Class="pa-8">
+        <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Accept=".tmlplanner" MaximumFileCount="1" Required="true">
+            <ButtonTemplate>
+                <MudButton HtmlTag="label"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.CloudUpload"
+                           for="@context">
+                    Upload Plan
+                </MudButton>
+            </ButtonTemplate>
+            <SelectedTemplate>
+                @if (context != null)
+                {
+                    <MudText>@context.Name</MudText>
+                }
+                else
+                {
+                    <MudText>Nothing selected</MudText>
+                }
+            </SelectedTemplate>
+        </MudFileUpload>
+    </MudPaper>
+    <MudText Align="Align.Center" Typo="Typo.h6">Deine Dateien werden nicht auf unseren Servern gespeichert! Sie werden lediglich ausgelesen und verarbeitet. Kein Byte deiner Datei landet auf unserer Fesplatte.</MudText>
+</MudStack>
+
+<style>
+        body, html {
+            height: 100%;
+            overflow-x: hidden;
+        }
+        
+        .mud-main-content {
+            height: 100% !important;
+        }
+</style>

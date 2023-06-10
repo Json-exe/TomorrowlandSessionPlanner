@@ -1,0 +1,46 @@
+﻿@page "/SessionAnalyzer"
+@using System.Globalization
+@inject PlannerManager PlannerManager
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+
+<PageTitle>Session Analyzer</PageTitle>
+
+@if (_loading)
+{
+    <MudStack Justify="Justify.Center" Style="display: flex; align-items: center;">
+        <MudProgressCircular Size="Size.Large" Indeterminate="true"/>
+        <MudText Align="Align.Center">Sessions are now being Analyzed...</MudText>
+    </MudStack>
+}
+else
+{
+    <MudText Align="Align.Center" Typo="Typo.h3" GutterBottom="true">Ein paar deiner Ausgewählten Sessions finden gleichzeitig statt!</MudText>
+    <MudGrid Spacing="2" Justify="Justify.Center">
+        @foreach (var session in _overlappingSessions)
+        {
+            <MudCard Elevation="8" Outlined="true" Class="ml-5 mb-5" Style="width: 400px;">
+                <MudCardContent>
+                    <MudGrid Justify="Justify.Center" Class="mb-3">
+                        <MudChip Color="Color.Info" Style="justify-self: center;" Size="Size.Large" Icon="@Icons.Material.Filled.LocationCity">
+                            <MudText Align="Align.Center" Typo="Typo.h4">@PlannerManager._stageList.First(x => x.id == session.StageId).Name</MudText>
+                        </MudChip>
+                    </MudGrid>
+                    <MudCard Outlined="true">
+                        <MudText GutterBottom="true" Typo="Typo.h6" Align="Align.Center">DJ: @PlannerManager._djList.First(x => x.id == session.DJId).Name</MudText>
+                        <MudText Typo="Typo.h6" Align="Align.Center">Von: @session.StartTime (@session.StartTime.ToString("dddd", new CultureInfo("de")))</MudText>
+                        <MudText Typo="Typo.h6" Align="Align.Center">Bis: @session.EndTime (@session.EndTime.ToString("dddd", new CultureInfo("de")))</MudText>
+                    </MudCard>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="() => RemoveUserSession(session)" StartIcon="@Icons.Material.Outlined.Remove">Remove!</MudButton>
+                </MudCardActions>
+            </MudCard>
+        }
+    </MudGrid>
+    
+    <MudGrid Justify="Justify.Center" Class="mb-3 mt-3" Spacing="2">
+        <MudButton Size="Size.Large" OnClick="@(() => NavigationManager.NavigateTo("/"))" Variant="Variant.Filled" Color="Color.Info" FullWidth="false" Style="width: 200px;">Zurück</MudButton>
+        <MudButton Size="Size.Large" Class="ml-2" OnClick="@(() => NavigationManager.NavigateTo("/Result"))" Variant="Variant.Filled" Color="Color.Info" FullWidth="false" Style="width: 200px;">Ignorieren</MudButton>
+    </MudGrid>
+}

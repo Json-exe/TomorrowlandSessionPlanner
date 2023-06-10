@@ -1,0 +1,130 @@
+﻿@page "/"
+@using System.Globalization
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject PlannerManager PlannerManager
+
+@code {
+
+    private void NavigateToSummary()
+    {
+        if (!PlannerManager.AddedSessions.Any())
+        {
+            Snackbar.Add("Bitte wähle mindestens eine Session aus!", Severity.Info);
+            return;
+        }
+        NavigationManager.NavigateTo("/summary");
+    }
+
+}
+
+<PageTitle>Create your plan</PageTitle>
+
+<MudStack>
+    <MudText Align="Align.Center" Class="mt-2" GutterBottom="true" Typo="Typo.h2">Bitte wähle deine Sessions für das jeweilige Wochenende aus</MudText>
+    <MudGrid Justify="Justify.Center" Class="mt-3 mb-3">
+        <MudButton Size="Size.Large" OnClick="NavigateToSummary" Variant="Variant.Filled" Class="mt-3" Color="Color.Info" FullWidth="false" Style="width: 200px;">Next</MudButton>
+    </MudGrid>
+    <MudExpansionPanels Elevation="5" MultiExpansion="true">
+        <MudExpansionPanel>
+            <TitleContent>
+                <MudText Align="Align.Center" Typo="Typo.h4">Weekend 1</MudText>
+            </TitleContent>
+            <ChildContent>
+                <MudPaper Elevation="5" Class="pa-8">
+                    <MudGrid Spacing="2" Justify="Justify.Center">
+                        @if (!_filteredSessions.Any(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
+                        {
+                            <MudChip Color="Color.Info" Icon="@Icons.Material.Outlined.Dataset">No data available</MudChip>
+                        }
+                        @foreach (var session in _filteredSessions.Where(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
+                        {
+                            <MudCard Elevation="8" Outlined="true" Class="ml-5" Style="min-width: 350px;">
+                                <MudCardContent>
+                                    <MudGrid Justify="Justify.Center" Class="mb-3">
+                                        <MudChip Color="Color.Info" Style="justify-self: center;" Size="Size.Large" Icon="@Icons.Material.Filled.LocationCity">
+                                            <MudText Align="Align.Center" Typo="Typo.h4">@_stageList.First(x => x.id == session.StageId).Name</MudText>
+                                        </MudChip>
+                                    </MudGrid>
+                                    <MudCard Outlined="true" Class="pa-3">
+                                        <MudText GutterBottom="true" Typo="Typo.h6" Align="Align.Center">DJ: @_djList.First(x => x.id == session.DJId).Name</MudText>
+                                        <MudText Typo="Typo.h6" Align="Align.Center">Von: @session.StartTime (@session.StartTime.ToString("dddd", new CultureInfo("de")))</MudText>
+                                        <MudText Typo="Typo.h6" Align="Align.Center">Bis: @session.EndTime (@session.EndTime.ToString("dddd", new CultureInfo("de")))</MudText>
+                                    </MudCard>
+                                </MudCardContent>
+                                <MudCardActions>
+                                    @if (PlannerManager.AddedSessions.Any(x => x.id == session.id))
+                                    {
+                                        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="() => RemoveUserSession(session)" StartIcon="@Icons.Material.Outlined.Remove">Remove!</MudButton>
+                                    }
+                                    else
+                                    {
+                                        <MudButton Variant="Variant.Outlined" Color="Color.Info" OnClick="() => AddUserSession(session)" StartIcon="@Icons.Material.Outlined.Add">Add!</MudButton>
+                                    }
+                                </MudCardActions>
+                            </MudCard>
+                        }
+                    </MudGrid>
+                </MudPaper>
+            </ChildContent>
+        </MudExpansionPanel>
+        <MudExpansionPanel IsInitiallyExpanded="true">
+            <TitleContent>
+                <MudText Align="Align.Center" Typo="Typo.h4">Weekend 2</MudText>
+            </TitleContent>
+            <ChildContent>
+                <MudPaper Elevation="5" Class="pa-8">
+                    <MudGrid Class="mb-3" Justify="Justify.FlexStart" Style="display: flex; align-items: center;">
+                        <MudItem xs="3">
+                            <MudSelect @bind-SelectedValues="@_stageFilter" MultiSelection="true" T="Stage" Variant="Variant.Outlined" Label="Filter stages" Clearable="true">
+                                @foreach (var item in _stageList)
+                                {
+                                    <MudSelectItem Value="@item">@item.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudAutocomplete T="string" ResetValueOnEmptyText="true" @bind-Value="@_djFilter" Clearable="true" Variant="Variant.Outlined" Label="Filter DJ" SearchFunc="@DjSearch"/>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Variant="Variant.Outlined" OnClick="ApplyFilters" Color="Color.Success">Apply</MudButton>
+                        </MudItem>
+                    </MudGrid>
+                    <MudGrid Spacing="2" Justify="Justify.Center">
+                        @if (!_filteredSessions.Any(x => x.StartTime >= _weekend2Start))
+                        {
+                            <MudChip Color="Color.Info" Icon="@Icons.Material.Outlined.Dataset">No data available</MudChip>
+                        }
+                        @foreach (var session in _filteredSessions.Where(x => x.StartTime >= _weekend2Start))
+                        {
+                            <MudCard Elevation="8" Outlined="true" Class="ml-5 mb-5" Style="width: 400px;">
+                                <MudCardContent>
+                                    <MudGrid Justify="Justify.Center" Class="mb-3">
+                                        <MudChip Color="Color.Info" Style="justify-self: center;" Size="Size.Large" Icon="@Icons.Material.Filled.LocationCity">
+                                            <MudText Align="Align.Center" Typo="Typo.h4">@_stageList.First(x => x.id == session.StageId).Name</MudText>
+                                        </MudChip>
+                                    </MudGrid>
+                                    <MudCard Outlined="true" Class="pa-3">
+                                        <MudText GutterBottom="true" Typo="Typo.h6" Align="Align.Center">DJ: @_djList.First(x => x.id == session.DJId).Name</MudText>
+                                        <MudText Typo="Typo.h6" Align="Align.Center">Von: @session.StartTime (@session.StartTime.ToString("dddd", new CultureInfo("de")))</MudText>
+                                        <MudText Typo="Typo.h6" Align="Align.Center">Bis: @session.EndTime (@session.EndTime.ToString("dddd", new CultureInfo("de")))</MudText>
+                                    </MudCard>
+                                </MudCardContent>
+                                <MudCardActions>
+                                    @if (PlannerManager.AddedSessions.Any(x => x.id == session.id))
+                                    {
+                                        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="() => RemoveUserSession(session)" StartIcon="@Icons.Material.Outlined.Remove">Remove!</MudButton>
+                                    }
+                                    else
+                                    {
+                                        <MudButton Variant="Variant.Outlined" Color="Color.Info" OnClick="() => AddUserSession(session)" StartIcon="@Icons.Material.Outlined.Add">Add!</MudButton>
+                                    }
+                                </MudCardActions>
+                            </MudCard>
+                        }
+                    </MudGrid>
+                </MudPaper>
+            </ChildContent>
+        </MudExpansionPanel>
+    </MudExpansionPanels>
+</MudStack>

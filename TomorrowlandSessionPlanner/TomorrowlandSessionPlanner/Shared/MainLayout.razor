@@ -1,0 +1,51 @@
+﻿@using TomorrowlandSessionPlanner.Code
+@inherits LayoutComponentBase
+@inject PlannerManager PlannerManager
+
+<PageTitle>Tomorrowland Session Planner</PageTitle>
+
+<MudThemeProvider IsDarkMode="true"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
+        <MudText Typo="Typo.h5" Class="ml-3">Tomorrowland Session Planner <MudChip Color="Color.Info" Size="Size.Medium">BETA</MudChip></MudText>
+        <MudSpacer/>
+        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Variant="DrawerVariant.Temporary" Elevation="2">
+        <NavMenu/>
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+    <MudScrollToTop>
+        <MudFab Color="Color.Tertiary" Icon="@Icons.Material.Filled.ArrowCircleUp"/>
+    </MudScrollToTop>
+</MudLayout>
+
+@code
+{
+    bool _drawerOpen;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await PlannerManager.Init();
+        }
+    }
+}
+
+<style>
+    body, html {
+                overflow-x: hidden;
+            }
+</style>
