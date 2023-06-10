@@ -8,6 +8,15 @@
   A TML Session Planner for viewing and planning sessions at the Tomorrowland Festival.
 </p>
 
+### FYI: This project is currently in BETA. I will update the UI and the Database during the next days to complete the dataset. You can watch the database current status here:
+## Progress
+
+- [x] Basic UI design
+- [x] Session filtering functionality
+- [ ] Simple session export to PDF
+- [ ] Update Database-Set to include data for Weekend 2 (50% Finished)
+- [ ] Update Database-Set to include data for Weekend 1
+
 ## Features!
 
 
