@@ -74,8 +74,8 @@ else
                         <MudTd DataLabel="End Time">@context.EndTime</MudTd>
                     </RowTemplate>
                 </MudTable>
-                <MudGrid>
-                    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="AddSession" Class="mt-2" StartIcon="@Icons.Material.Filled.Add">Add Session</MudButton>
+                <MudGrid Class="mt-3" Spacing="2">
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="AddSession" StartIcon="@Icons.Material.Filled.Add">Add Session</MudButton>
                     <MudSelect class="ml-2" @bind-Value="@_selectedStage" FullWidth="false" Variant="Variant.Outlined" Label="Pre-select Stage" Clearable="true">
                         @foreach (var item in _stageList)
                         {
