@@ -1,7 +1,7 @@
 <h1 align="center">Tomorrowland Session Planner</h1>
 
 <p align="center">
-  [TMLSessionPlaner-Logo](https://github.com/Json-exe/TomorrowlandSessionPlanner/assets/96955704/0e6973a4-cc19-4247-a05e-967eafe6427a)
+  <img style="height: 200px;" src="https://github.com/Json-exe/TomorrowlandSessionPlanner/assets/96955704/0e6973a4-cc19-4247-a05e-967eafe6427a" alt="Tomorrowland Session Planner Logo">
 </p>
 
 <p align="center">
