@@ -62,11 +62,16 @@ The plan creation flow remains the same for self-hosting. To edit the database, 
 ## Screenshots
 
 <p align="center">
-  <img src="https://your-screenshot-url.com" alt="Screenshot 1" width="600">
+  <img src="https://github.com/Json-exe/TomorrowlandSessionPlanner/assets/96955704/63c79960-5c90-4b28-9175-841cc1e5ba46" alt="Screenshot 1" width="600">
 </p>
-
 <p align="center">
-  <img src="https://your-screenshot-url.com" alt="Screenshot 2" width="600">
+  <img src="https://github.com/Json-exe/TomorrowlandSessionPlanner/assets/96955704/b3aed58e-104b-426c-bf88-4b7a155dce71" alt="Screenshot 2" width="600">
+</p>
+<p align="center">
+  <img src="https://github.com/Json-exe/TomorrowlandSessionPlanner/assets/96955704/03943d2c-af8b-49f6-8225-0bdc686ea4d8" alt="Screenshot 3" width="600">
+</p>
+<p align="center">
+  <img src="https://github.com/Json-exe/TomorrowlandSessionPlanner/assets/96955704/d19f41ae-eff7-4bfc-8d94-422a25a2a621" alt="Screenshot 4" width="600">
 </p>
 
 ## Technologies Used
