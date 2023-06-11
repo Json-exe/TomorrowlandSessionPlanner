@@ -15,7 +15,7 @@
 - [x] Session filtering functionality
 - [ ] Simple session export to PDF
 - [X] Update Database-Set to include data for Weekend 2
-- [ ] Update Database-Set to include data for Weekend 1
+- [X] Update Database-Set to include data for Weekend 1
 
 ## Features!
 
@@ -40,7 +40,7 @@
 
 ### Common Use
 
-Visit the official Tomorrowland Session Planner website: [https://your-website-url.com](https://your-website-url.com) and start planning your sessions!
+Visit the official Tomorrowland Session Planner website: [http://tmlsessionplanner.jasondevelopmentstudios.de](http://tmlsessionplanner.jasondevelopmentstudios.de) and start planning your sessions!
 
 ## Usage
 
