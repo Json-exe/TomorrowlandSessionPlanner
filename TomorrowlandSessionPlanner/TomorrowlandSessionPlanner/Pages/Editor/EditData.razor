@@ -2,6 +2,7 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
+@inject PlannerManager PlannerManager
 
 @if (_loading)
 {
@@ -76,6 +77,27 @@ else
                 </MudTable>
                 <MudGrid Class="mt-3" Spacing="2">
                     <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="AddSession" StartIcon="@Icons.Material.Filled.Add">Add Session</MudButton>
+                    <MudFileUpload T="IBrowserFile" FilesChanged="ImportSessions" Accept=".json" MaximumFileCount="1">
+                        <ButtonTemplate>
+                            <MudButton HtmlTag="label"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Success"
+                                       StartIcon="@Icons.Material.Filled.ImportExport"
+                                       for="@context">
+                                Import from file
+                            </MudButton>
+                        </ButtonTemplate>
+                        <SelectedTemplate>
+                            @if (context != null)
+                            {
+                                <MudText>@context.Name</MudText>
+                            }
+                            else
+                            {
+                                <MudText>Nothing selected</MudText>
+                            }
+                        </SelectedTemplate>
+                    </MudFileUpload>
                     <MudSelect class="ml-2" @bind-Value="@_selectedStage" FullWidth="false" Variant="Variant.Outlined" Label="Pre-select Stage" Clearable="true">
                         @foreach (var item in _stageList)
                         {

@@ -1,5 +1,7 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.Data.Sqlite;
 using MudBlazor;
+using Newtonsoft.Json;
 using TomorrowlandSessionPlanner.Dialogs;
 using TomorrowlandSessionPlanner.Models;
 
@@ -24,11 +26,12 @@ public partial class EditData
             { "PreSelectedStage", _selectedStage },
             { "PreSelectedDate", _startDate }
         };
-        var dialog = await DialogService.ShowAsync<AddSessionDialog>("Add Session", parameters, new DialogOptions { CloseButton = false, FullWidth = true, CloseOnEscapeKey = false, DisableBackdropClick = true });
+        var dialog = await DialogService.ShowAsync<AddSessionDialog>("Add Session", parameters,
+            new DialogOptions
+                { CloseButton = false, FullWidth = true, CloseOnEscapeKey = false, DisableBackdropClick = true });
         var result = await dialog.Result;
         if (result.Canceled) return;
-        var session = (Session) result.Data;
-        _sessionList.Add(session);
+        var session = (Session)result.Data;
         await AddSessionToDatabase(session);
         StateHasChanged();
     }
@@ -39,16 +42,20 @@ public partial class EditData
         var databasePath = Path.Combine(currentDirectory, "Data", "tmldata.db");
         await using var connection = new SqliteConnection($"Data Source={databasePath}");
         await connection.OpenAsync();
-        var command = new SqliteCommand("INSERT INTO Sessions (StageId, DJId, StartTime, EndTime) VALUES (@StageId, @DJId, @StartTime, @EndTime)", connection);
+        var command =
+            new SqliteCommand(
+                "INSERT INTO Sessions (StageId, DJId, StartTime, EndTime) VALUES (@StageId, @DJId, @StartTime, @EndTime)",
+                connection);
         command.Parameters.AddWithValue("@StageId", session.StageId);
         command.Parameters.AddWithValue("@DJId", session.DJId);
         command.Parameters.AddWithValue("@StartTime", session.StartTime);
         command.Parameters.AddWithValue("@EndTime", session.EndTime);
         await command.ExecuteNonQueryAsync();
         await connection.CloseAsync();
-        @Snackbar.Add("Session added to database", Severity.Success);
+        _sessionList.Add(session);
+        Snackbar.Add("Session added to database", Severity.Success);
     }
-    
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!IsAccessible)
@@ -56,6 +63,7 @@ public partial class EditData
             NavigationManager.NavigateTo("/");
             return;
         }
+
         if (firstRender)
         {
             var currentDirectory = Directory.GetCurrentDirectory();
@@ -74,12 +82,12 @@ public partial class EditData
                     Name = reader.GetString(1)
                 });
             }
-        
+
             await reader.CloseAsync();
-        
+
             command = new SqliteCommand("SELECT * FROM Stages", connection);
             reader = await command.ExecuteReaderAsync();
-        
+
             while (await reader.ReadAsync())
             {
                 _stageList.Add(new Stage
@@ -88,13 +96,13 @@ public partial class EditData
                     Name = reader.GetString(1)
                 });
             }
-        
+
             await reader.CloseAsync();
-        
+
             command = new SqliteCommand("SELECT * FROM Sessions", connection);
-        
+
             reader = await command.ExecuteReaderAsync();
-        
+
             while (await reader.ReadAsync())
             {
                 _sessionList.Add(new Session
@@ -106,11 +114,122 @@ public partial class EditData
                     EndTime = reader.GetDateTime(4)
                 });
             }
-        
+
             await reader.CloseAsync();
             await connection.CloseAsync();
             _loading = false;
             StateHasChanged();
+        }
+    }
+
+    private async void ImportSessions(IBrowserFile file)
+    {
+        try
+        {
+            if (file == null)
+            {
+                throw new Exception("No File selected!");
+            }
+
+            if (!file.Name.EndsWith(".json"))
+            {
+                throw new Exception("Wrong File Format!");
+            }
+
+            var fileContent = file.OpenReadStream();
+            var json = await new StreamReader(fileContent).ReadToEndAsync();
+            var sessionsToImport = JsonConvert.DeserializeObject<List<SessionImportModel>>(json);
+            if (sessionsToImport == null)
+            {
+                throw new Exception("No Sessions found!");
+            }
+
+            Snackbar.Add(
+                $"Importing {sessionsToImport.Count} Sessions this could take a while... Please wait until the import is finished!",
+                Severity.Info);
+            await AnalyzeImport(sessionsToImport);
+            Snackbar.Add("Import finished!", Severity.Success);
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            Snackbar.Add(
+                "Es ist ein Fehler beim importieren der Datei aufgetreten! Bitte stelle sicher das dies die Richtige Datei ist!",
+                Severity.Error);
+        }
+    }
+
+    private async Task AnalyzeImport(List<SessionImportModel> sessions)
+    {
+        var failedSessions = new List<SessionImportModel>();
+        var updatedSessions = new List<SessionImportModel>();
+        var newSessions = new List<SessionImportModel>();
+        var newSessionsImportData = new List<Session>();
+        var updatedSessionsImportData = new List<Session>();
+        foreach (var sessionImportModel in sessions)
+        {
+            try
+            {
+                var stage = _stageList.First(x => x.Name == sessionImportModel.StageName);
+                var dj = _djList.First(x => x.Name == sessionImportModel.DJName);
+                var session = new Session
+                {
+                    StageId = stage.id,
+                    DJId = dj.id,
+                    StartTime = sessionImportModel.StartTime,
+                    EndTime = sessionImportModel.EndTime
+                };
+                if (_sessionList.Any(x =>
+                        x.StageId == session.StageId && x.StartTime == session.StartTime &&
+                        x.EndTime == session.EndTime))
+                {
+                    // Check if the dj is the same
+                    var existingSession = _sessionList.First(x =>
+                        x.StageId == session.StageId && x.StartTime == session.StartTime &&
+                        x.EndTime == session.EndTime);
+
+                    if (existingSession.DJId != session.DJId)
+                    {
+                        updatedSessions.Add(sessionImportModel);
+                        updatedSessionsImportData.Add(session);
+                        continue;
+                    }
+
+                    failedSessions.Add(sessionImportModel);
+                    continue;
+                }
+
+                newSessions.Add(sessionImportModel);
+                newSessionsImportData.Add(session);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                failedSessions.Add(sessionImportModel);
+            }
+        }
+
+        Snackbar.Add($"Failed Session imports: {failedSessions.Count} Likely they exist already", Severity.Error);
+        Snackbar.Add($"Updated Session imports: {updatedSessions.Count} Data that is in the database but is incorrect",
+            Severity.Warning);
+        Snackbar.Add($"New Session imports: {newSessions.Count}", Severity.Success);
+        var dialog = await DialogService.ShowAsync<ImportSessionInfoDialog>("Import Info", new DialogParameters
+        {
+            { "newSessions", newSessions },
+            { "updatedSessions", updatedSessions }
+        }, new DialogOptions
+        {
+            CloseButton = false,
+            FullWidth = true,
+            CloseOnEscapeKey = false,
+            DisableBackdropClick = true
+        });
+        var result = await dialog.Result;
+        if (result.Canceled) return;
+        foreach (var session in newSessionsImportData)
+        {
+            await AddSessionToDatabase(session);
         }
     }
 }

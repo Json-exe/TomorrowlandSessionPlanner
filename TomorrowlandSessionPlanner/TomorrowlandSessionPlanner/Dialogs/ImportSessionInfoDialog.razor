@@ -1,0 +1,51 @@
+﻿@code {
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public List<SessionImportModel> newSessions { get; set; }
+
+    [Parameter]
+    public List<SessionImportModel> updatedSessions { get; set; }
+
+}
+
+<MudDialog>
+    <DialogContent>
+        <MudText Align="Align.Center" GutterBottom="true" Typo="Typo.h5">Sessions to import</MudText>
+        <MudTable Items="newSessions">
+            <HeaderContent>
+                <MudTh>DJ Name</MudTh>
+                <MudTh>Stage Name</MudTh>
+                <MudTh>Start</MudTh>
+                <MudTh>End</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="DJ Name">@context.DJName</MudTd>
+                <MudTd DataLabel="Stage Name">@context.StageName</MudTd>
+                <MudTd DataLabel="Start">@context.StartTime</MudTd>
+                <MudTd DataLabel="End">@context.EndTime</MudTd>
+            </RowTemplate>
+        </MudTable>
+        <MudText Align="Align.Center" GutterBottom="true" Typo="Typo.h5">Sessions to update</MudText>
+        <MudTable Items="updatedSessions">
+            <HeaderContent>
+                <MudTh>DJ Name</MudTh>
+                <MudTh>Stage Name</MudTh>
+                <MudTh>Start</MudTh>
+                <MudTh>End</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="DJ Name">@context.DJName</MudTd>
+                <MudTd DataLabel="Stage Name">@context.StageName</MudTd>
+                <MudTd DataLabel="Start">@context.StartTime</MudTd>
+                <MudTd DataLabel="End">@context.EndTime</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="() => MudDialog.Close(DialogResult.Ok(true))">Add them!</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="MudDialog.Cancel">Abort!</MudButton>
+    </DialogActions>
+</MudDialog>

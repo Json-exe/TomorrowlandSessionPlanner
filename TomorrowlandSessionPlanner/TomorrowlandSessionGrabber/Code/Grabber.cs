@@ -26,6 +26,7 @@ public class Grabber
         var driver = new FirefoxDriver(options);
         _driver = driver;
         driver.Navigate().GoToUrl(BaseUrl);
+        driver.ExecuteScript("Cookiebot.dialog.submitConsent()");
         if (grabberOptions.Weekend == Weekend.Weekend1)
         {
             var weekendSwitch = driver.FindElement(By.ClassName("weekend-switch"));
@@ -149,14 +150,21 @@ public class Grabber
                     // We want only the Name: Claptone
                     var djNameParts = djName.Split("\r");
                     // Also the part in front of the name must be removed
-                    var djNameParts2 = djNameParts[0].Split(":");
-                    if (djNameParts2.Length > 1)
+                    if (!djNameParts[0].Contains("KAS:ST"))
                     {
-                        djName = djNameParts2[1];
-                    } 
+                        var djNameParts2 = djNameParts[0].Split(":");
+                        if (djNameParts2.Length > 1)
+                        {
+                            djName = djNameParts2[1];
+                        } 
+                        else
+                        {
+                            djName = djNameParts2[0];
+                        }
+                    }
                     else
                     {
-                        djName = djNameParts2[0];
+                        djName = djNameParts[0];
                     }
                     session.DJName = djName.Trim();
                     Console.WriteLine(
