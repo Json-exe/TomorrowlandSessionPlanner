@@ -82,6 +82,7 @@ else
                             <MudSelectItem Value="@item.id">@item.Name</MudSelectItem>
                         }
                     </MudSelect>
+                    <MudDatePicker @bind-Date="@_startDate" Editable="true" Variant="Variant.Outlined" Clearable="true" Label="Pre-select a date"/>
                 </MudGrid>
             </MudPaper>
         </MudItem>

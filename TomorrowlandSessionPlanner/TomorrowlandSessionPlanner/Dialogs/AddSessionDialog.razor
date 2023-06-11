@@ -46,6 +46,9 @@
     
     [Parameter]
     public int PreSelectedStage { get; set; } = -1;
+    
+    [Parameter]
+    public DateTime? PreSelectedDate { get; set; } = DateTime.Now;
 
     private int _selectedDj;
     private int _selectedStage;
@@ -56,8 +59,10 @@
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (!firstRender && PreSelectedStage >= 0) return;
-        _selectedStage = PreSelectedStage;
+        if (!firstRender) return;
+        _selectedStage = PreSelectedStage >= 0 ? PreSelectedStage : Stages.First().id;
+        _startDate = PreSelectedDate;
+        _endDate = PreSelectedDate;
         StateHasChanged();
     }
 

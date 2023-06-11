@@ -12,6 +12,7 @@ public partial class EditData
     private readonly List<Session> _sessionList = new();
     private bool _loading = true;
     private int _selectedStage;
+    private DateTime? _startDate;
     private const bool IsAccessible = true;
 
     private async void AddSession()
@@ -20,7 +21,8 @@ public partial class EditData
         {
             { "Djs", _djList },
             { "Stages", _stageList },
-            { "PreSelectedStage", _selectedStage }
+            { "PreSelectedStage", _selectedStage },
+            { "PreSelectedDate", _startDate }
         };
         var dialog = await DialogService.ShowAsync<AddSessionDialog>("Add Session", parameters, new DialogOptions { CloseButton = false, FullWidth = true, CloseOnEscapeKey = false, DisableBackdropClick = true });
         var result = await dialog.Result;
