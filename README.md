@@ -14,7 +14,7 @@
 - [x] Basic UI design
 - [x] Session filtering functionality
 - [ ] Simple session export to PDF
-- [ ] Update Database-Set to include data for Weekend 2 (50% Finished)
+- [X] Update Database-Set to include data for Weekend 2
 - [ ] Update Database-Set to include data for Weekend 1
 
 ## Features!
