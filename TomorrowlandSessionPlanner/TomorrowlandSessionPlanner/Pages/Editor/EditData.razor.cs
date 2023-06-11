@@ -16,7 +16,7 @@ public partial class EditData
     private int _selectedStage;
     private DateTime? _startDate;
     private string? newDJ;
-    private const bool IsAccessible = true;
+    private const bool IsAccessible = false;
 
     private async void AddSession()
     {
