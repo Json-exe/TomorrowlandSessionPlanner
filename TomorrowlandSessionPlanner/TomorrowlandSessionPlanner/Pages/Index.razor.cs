@@ -87,7 +87,7 @@ public partial class Index
             StateHasChanged();
             return;
         }
-        var dj = _djList.FirstOrDefault(x => _djFilter != null && x.Name.Contains(_djFilter, StringComparison.InvariantCultureIgnoreCase));
+        var dj = _djList.FirstOrDefault(x => _djFilter != null && x.Name.Equals(_djFilter, StringComparison.InvariantCultureIgnoreCase));
         // Filter by stage and dj
         if (_stageFilter.Any() && !string.IsNullOrEmpty(_djFilter))
         {

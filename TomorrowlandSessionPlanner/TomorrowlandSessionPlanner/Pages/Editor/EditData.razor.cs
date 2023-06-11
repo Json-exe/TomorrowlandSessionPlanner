@@ -15,6 +15,7 @@ public partial class EditData
     private bool _loading = true;
     private int _selectedStage;
     private DateTime? _startDate;
+    private string? newDJ;
     private const bool IsAccessible = true;
 
     private async void AddSession()
@@ -122,6 +123,78 @@ public partial class EditData
         }
     }
 
+    private async void ImportDj(IBrowserFile file)
+    {
+        try
+        {
+            if (file == null)
+            {
+                throw new Exception("No File selected!");
+            }
+
+            if (!file.Name.EndsWith(".json"))
+            {
+                throw new Exception("Wrong File Format!");
+            }
+
+            var fileContent = file.OpenReadStream();
+            var json = await new StreamReader(fileContent).ReadToEndAsync();
+            var sessionsToImport = JsonConvert.DeserializeObject<List<SessionImportModel>>(json);
+            if (sessionsToImport == null)
+            {
+                throw new Exception("No Sessions found!");
+            }
+
+            Snackbar.Add(
+                $"Importing {sessionsToImport.Count} DJs this could take a while... Please wait until the import is finished!",
+                Severity.Info);
+            await AnalyzeImportDJs(sessionsToImport);
+            Snackbar.Add("Import finished!", Severity.Success);
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            Snackbar.Add(
+                "Es ist ein Fehler beim importieren der Datei aufgetreten! Bitte stelle sicher das dies die Richtige Datei ist!",
+                Severity.Error);
+        }
+    }
+
+    private async Task AnalyzeImportDJs(List<SessionImportModel> dj)
+    {
+        var newDjs = new List<SessionImportModel>();
+        var newDjsData = new List<Dj>();
+        foreach (var djImportModel in dj)
+        {
+            if (_djList.Any(x => x.Name == djImportModel.DJName) || newDjs.Any(x => x.DJName == djImportModel.DJName)) continue;
+            var newDj = new Dj
+            {
+                Name = djImportModel.DJName
+            };
+            newDjsData.Add(newDj);
+            newDjs.Add(djImportModel);
+        }
+        
+        Snackbar.Add($"New Djs imports: {newDjs.Count}", Severity.Success);
+        var dialog = await DialogService.ShowAsync<ImportSessionInfoDialog>("Import Info", new DialogParameters
+        {
+            { "newSessions", newDjs },
+        }, new DialogOptions
+        {
+            CloseButton = false,
+            FullWidth = true,
+            CloseOnEscapeKey = false,
+            DisableBackdropClick = true
+        });
+        var result = await dialog.Result;
+        if (result.Canceled) return;
+        foreach (var djData in newDjsData)
+        {
+            await AddDj(djData);
+        }
+    }
+
     private async void ImportSessions(IBrowserFile file)
     {
         try
@@ -147,7 +220,7 @@ public partial class EditData
             Snackbar.Add(
                 $"Importing {sessionsToImport.Count} Sessions this could take a while... Please wait until the import is finished!",
                 Severity.Info);
-            await AnalyzeImport(sessionsToImport);
+            await AnalyzeImportSessions(sessionsToImport);
             Snackbar.Add("Import finished!", Severity.Success);
             StateHasChanged();
         }
@@ -160,7 +233,7 @@ public partial class EditData
         }
     }
 
-    private async Task AnalyzeImport(List<SessionImportModel> sessions)
+    private async Task AnalyzeImportSessions(List<SessionImportModel> sessions)
     {
         var failedSessions = new List<SessionImportModel>();
         var updatedSessions = new List<SessionImportModel>();
@@ -171,6 +244,7 @@ public partial class EditData
         {
             try
             {
+                sessionImportModel.StageName = sessionImportModel.StageName.ToUpper() == "CORE" ? sessionImportModel.StageName.ToUpper() : sessionImportModel.StageName;
                 var stage = _stageList.First(x => x.Name == sessionImportModel.StageName);
                 var dj = _djList.First(x => x.Name == sessionImportModel.DJName);
                 var session = new Session
@@ -231,5 +305,32 @@ public partial class EditData
         {
             await AddSessionToDatabase(session);
         }
+    }
+
+    private async Task AddDj(Dj dj)
+    {
+        var currentDirectory = Directory.GetCurrentDirectory();
+        var databasePath = Path.Combine(currentDirectory, "Data", "tmldata.db");
+        await using var connection = new SqliteConnection($"Data Source={databasePath}");
+        await connection.OpenAsync();
+        var command =
+            new SqliteCommand(
+                "INSERT INTO DJs (Name) VALUES (@DJName)",
+                connection);
+        command.Parameters.AddWithValue("@DJName", dj.Name);
+        await command.ExecuteNonQueryAsync();
+        await connection.CloseAsync();
+        _djList.Add(dj);
+        Snackbar.Add("DJ added to database", Severity.Success);
+    }
+
+    private async void AddNewDj()
+    {
+        if (string.IsNullOrEmpty(newDJ) || _djList.All(x => x.Name != newDJ)) return;
+        var dj = new Dj
+        {
+            Name = newDJ
+        };
+        await AddDj(dj);
     }
 }

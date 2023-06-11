@@ -41,6 +41,31 @@ else
                         <MudTd DataLabel="DJ Name">@context.Name</MudTd>
                     </RowTemplate>
                 </MudTable>
+                <MudGrid Spacing="2" Class="mt-3">
+                    <MudTextField T="string" Variant="Variant.Outlined" bind-Value="@newDJ" Label="Enter name of DJ to add"/>
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="AddNewDj" StartIcon="@Icons.Material.Filled.Add">Add DJ</MudButton>
+                    <MudFileUpload T="IBrowserFile" FilesChanged="ImportDj" Accept=".json" MaximumFileCount="1">
+                        <ButtonTemplate>
+                            <MudButton HtmlTag="label"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Success"
+                                       StartIcon="@Icons.Material.Filled.ImportExport"
+                                       for="@context">
+                                Import from file
+                            </MudButton>
+                        </ButtonTemplate>
+                        <SelectedTemplate>
+                            @if (context != null)
+                            {
+                                <MudText>@context.Name</MudText>
+                            }
+                            else
+                            {
+                                <MudText>Nothing selected</MudText>
+                            }
+                        </SelectedTemplate>
+                    </MudFileUpload>
+                </MudGrid>
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="6">

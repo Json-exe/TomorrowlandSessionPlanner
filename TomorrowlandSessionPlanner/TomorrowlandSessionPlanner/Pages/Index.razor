@@ -32,6 +32,22 @@
             </TitleContent>
             <ChildContent>
                 <MudPaper Elevation="5" Class="pa-8">
+                    <MudGrid Class="mb-3" Justify="Justify.FlexStart" Style="display: flex; align-items: center;">
+                        <MudItem xs="3">
+                            <MudSelect @bind-SelectedValues="@_stageFilter" MultiSelection="true" T="Stage" Variant="Variant.Outlined" Label="Filter stages" Clearable="true">
+                                @foreach (var item in _stageList)
+                                {
+                                    <MudSelectItem Value="@item">@item.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudAutocomplete T="string" ResetValueOnEmptyText="true" @bind-Value="@_djFilter" Clearable="true" Variant="Variant.Outlined" Label="Filter DJ" SearchFunc="@DjSearch"/>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudButton Variant="Variant.Outlined" OnClick="ApplyFilters" Color="Color.Success">Apply</MudButton>
+                        </MudItem>
+                    </MudGrid>
                     <MudGrid Spacing="2" Justify="Justify.Center">
                         @if (!_filteredSessions.Any(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
                         {
@@ -39,7 +55,7 @@
                         }
                         @foreach (var session in _filteredSessions.Where(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
                         {
-                            <MudCard Elevation="8" Outlined="true" Class="ml-5" Style="min-width: 350px;">
+                            <MudCard Elevation="8" Outlined="true" Class="ml-5 mb-5" Style="min-width: 350px;">
                                 <MudCardContent>
                                     <MudGrid Justify="Justify.Center" Class="mb-3">
                                         <MudChip Color="Color.Info" Style="justify-self: center;" Size="Size.Large" Icon="@Icons.Material.Filled.LocationCity">

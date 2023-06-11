@@ -150,7 +150,7 @@ public class Grabber
                     // We want only the Name: Claptone
                     var djNameParts = djName.Split("\r");
                     // Also the part in front of the name must be removed
-                    if (!djNameParts[0].Contains("KAS:ST"))
+                    if (!djNameParts[0].Contains("KAS:ST") && !djNameParts[0].Contains("Myu:sa"))
                     {
                         var djNameParts2 = djNameParts[0].Split(":");
                         if (djNameParts2.Length > 1)

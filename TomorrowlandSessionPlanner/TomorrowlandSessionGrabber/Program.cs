@@ -7,7 +7,7 @@ namespace TomorrowlandSessionGrabber
     {
         private static void Main(string[] args)
         {
-            new Grabber().Start(new GrabberOptions() { Headless = true, Weekend = Weekend.Weekend2 });
+            new Grabber().Start(new GrabberOptions() { Headless = true, Weekend = Weekend.Weekend1 });
         }
     }
 }

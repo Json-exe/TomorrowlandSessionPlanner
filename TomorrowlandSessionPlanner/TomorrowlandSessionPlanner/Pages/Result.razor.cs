@@ -12,6 +12,8 @@ public partial class Result
     private bool _loading = true;
     private List<Session> _sortedSessions = new();
     private IJSObjectReference _jsModule = null!;
+    private readonly DateTime _weekend2Start = new(2023, 7, 28, 00, 0, 0);
+    private readonly DateTime _weekend1Start = new(2023, 7, 21, 00, 0, 0);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
