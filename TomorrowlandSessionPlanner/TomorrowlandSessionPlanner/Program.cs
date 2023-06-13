@@ -7,7 +7,6 @@ using TomorrowlandSessionPlanner.Code;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices(configuration =>
@@ -19,11 +18,16 @@ builder.Services.AddMudServices(configuration =>
 });
 builder.Services.AddScoped<PlannerManager>();
 
+
+
 if (!builder.Environment.IsDevelopment())
 {
     builder.WebHost.ConfigureKestrel(options =>
     {
-        options.Listen(IPAddress.Loopback, 5002);
+        options.Listen(IPAddress.Loopback, 5002, listenOptions =>
+        {
+            listenOptions.UseHttps(new X509Certificate2("/home/jason/certs/tmlPlanner/certificate.pfx", Environment.GetCommandLineArgs()[0]));
+        });
     });
 }
 
@@ -40,11 +44,13 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseHsts();
-    app.UseHttpsRedirection();
-}
+// if (app.Environment.IsDevelopment())
+// {
+//     app.UseHsts();
+//     app.UseHttpsRedirection();
+// }
+app.UseHsts();
+app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
