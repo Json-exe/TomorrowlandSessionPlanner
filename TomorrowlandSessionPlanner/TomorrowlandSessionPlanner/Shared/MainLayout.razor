@@ -36,14 +36,6 @@
     {
         _drawerOpen = !_drawerOpen;
     }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await PlannerManager.Init();
-        }
-    }
 }
 
 <style>

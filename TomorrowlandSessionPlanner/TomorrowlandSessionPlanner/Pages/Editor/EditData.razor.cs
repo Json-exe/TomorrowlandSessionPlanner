@@ -15,7 +15,7 @@ public partial class EditData
     private bool _loading = true;
     private int _selectedStage;
     private DateTime? _startDate;
-    private string? newDJ;
+    private string? _newDj;
     private const bool IsAccessible = false;
 
     private async void AddSession()
@@ -305,6 +305,34 @@ public partial class EditData
         {
             await AddSessionToDatabase(session);
         }
+
+        foreach (var sessionToUpdate in updatedSessionsImportData)
+        {
+            await UpdateSessionInDatabase(sessionToUpdate);
+        }
+    }
+
+    private async Task UpdateSessionInDatabase(Session session)
+    {
+        var currentDirectory = Directory.GetCurrentDirectory();
+        var databasePath = Path.Combine(currentDirectory, "Data", "tmldata.db");
+        await using var connection = new SqliteConnection($"Data Source={databasePath}");
+        await connection.OpenAsync();
+        var command =
+            new SqliteCommand(
+                "UPDATE Sessions SET DJId = @DJId WHERE StageId = @StageId AND StartTime = @StartTime AND EndTime = @EndTime",
+                connection);
+        command.Parameters.AddWithValue("@StageId", session.StageId);
+        command.Parameters.AddWithValue("@DJId", session.DJId);
+        command.Parameters.AddWithValue("@StartTime", session.StartTime);
+        command.Parameters.AddWithValue("@EndTime", session.EndTime);
+        await command.ExecuteNonQueryAsync();
+        await connection.CloseAsync();
+        _sessionList.First(x =>
+                x.StageId == session.StageId && x.StartTime == session.StartTime &&
+                x.EndTime == session.EndTime)
+            .DJId = session.DJId;
+        Snackbar.Add("Session updated in database", Severity.Success);
     }
 
     private async Task AddDj(Dj dj)
@@ -326,10 +354,10 @@ public partial class EditData
 
     private async void AddNewDj()
     {
-        if (string.IsNullOrEmpty(newDJ) || _djList.All(x => x.Name != newDJ)) return;
+        if (string.IsNullOrEmpty(_newDj) || _djList.All(x => x.Name != _newDj)) return;
         var dj = new Dj
         {
-            Name = newDJ
+            Name = _newDj
         };
         await AddDj(dj);
     }

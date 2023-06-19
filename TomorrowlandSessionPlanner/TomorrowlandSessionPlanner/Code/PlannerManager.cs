@@ -12,6 +12,8 @@ public class PlannerManager
 
     public async Task Init()
     {
+        if (_djList.Any() && _stageList.Any() && _sessionList.Any()) return;
+        
         var currentDirectory = Directory.GetCurrentDirectory();
         var databasePath = Path.Combine(currentDirectory, "Data", "tmldata.db");
         await using var connection = new SqliteConnection($"Data Source={databasePath}");

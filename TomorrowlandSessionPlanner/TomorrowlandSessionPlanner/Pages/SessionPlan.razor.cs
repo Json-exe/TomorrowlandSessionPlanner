@@ -7,34 +7,41 @@ public partial class SessionPlan
 {
     private bool _loading = true;
 
-    private readonly List<Session> _overlappingSessions = new();
+    private readonly List<OverlappingSessionClass> _overlappingSessionClasses = new();
 
     private async Task CheckSessions()
     {
         _loading = true;
-        _overlappingSessions.Clear();
+        _overlappingSessionClasses.Clear();
         StateHasChanged();
         var allOverlappingSessions = new List<Session>();
+        var overlappingSessions = new List<OverlappingSessionClass>();
         foreach (var addedSession in PlannerManager.AddedSessions)
         {
             var isBetween = false;
+            var overlapSession = new OverlappingSessionClass
+            {
+                Session = addedSession,
+                OverlappingSessions = new List<Session>()
+            };
 
             foreach (var otherSession in PlannerManager.AddedSessions.Where(x => x != addedSession))
             {
                 if (!IsSessionOverlapping(addedSession, otherSession)) continue;
                 isBetween = true;
-                break;
+                overlapSession.OverlappingSessions.Add(otherSession);
             }
 
             if (isBetween)
             {
                 allOverlappingSessions.Add(addedSession);
+                overlappingSessions.Add(overlapSession);
             }
         }
 
         if (allOverlappingSessions.Count > 1)
         {
-            _overlappingSessions.AddRange(allOverlappingSessions);
+            _overlappingSessionClasses.AddRange(overlappingSessions);
             Snackbar.Add(
                 $"Du hast {allOverlappingSessions.Count} überschneidende Sessions in deinem Plan! Bitte überprüfen deinen Plan erneut.",
                 Severity.Info);

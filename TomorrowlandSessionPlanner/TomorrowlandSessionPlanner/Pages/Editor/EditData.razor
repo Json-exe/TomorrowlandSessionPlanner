@@ -42,7 +42,7 @@ else
                     </RowTemplate>
                 </MudTable>
                 <MudGrid Spacing="2" Class="mt-3">
-                    <MudTextField T="string" Variant="Variant.Outlined" bind-Value="@newDJ" Label="Enter name of DJ to add"/>
+                    <MudTextField T="string" Variant="Variant.Outlined" bind-Value="@_newDj" Label="Enter name of DJ to add"/>
                     <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="AddNewDj" StartIcon="@Icons.Material.Filled.Add">Add DJ</MudButton>
                     <MudFileUpload T="IBrowserFile" FilesChanged="ImportDj" Accept=".json" MaximumFileCount="1">
                         <ButtonTemplate>

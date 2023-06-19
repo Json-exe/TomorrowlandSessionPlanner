@@ -13,63 +13,18 @@ public partial class Index
     private readonly DateTime _weekend1Start = new(2023, 7, 21, 00, 0, 0);
     private IEnumerable<Stage> _stageFilter = new List<Stage>();
     private string? _djFilter;
+    private bool _loading = true;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            var currentDirectory = Directory.GetCurrentDirectory();
-            var databasePath = Path.Combine(currentDirectory, "Data", "tmldata.db");
-            await using var connection = new SqliteConnection($"Data Source={databasePath}");
-            await connection.OpenAsync();
-
-            var command = new SqliteCommand("SELECT * FROM DJs", connection);
-            var reader = await command.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
-            {
-                _djList.Add(new Dj
-                {
-                    id = reader.GetInt32(0),
-                    Name = reader.GetString(1)
-                });
-            }
-        
-            await reader.CloseAsync();
-        
-            command = new SqliteCommand("SELECT * FROM Stages", connection);
-            reader = await command.ExecuteReaderAsync();
-        
-            while (await reader.ReadAsync())
-            {
-                _stageList.Add(new Stage
-                {
-                    id = reader.GetInt32(0),
-                    Name = reader.GetString(1)
-                });
-            }
-        
-            await reader.CloseAsync();
-        
-            command = new SqliteCommand("SELECT * FROM Sessions", connection);
-        
-            reader = await command.ExecuteReaderAsync();
-        
-            while (await reader.ReadAsync())
-            {
-                _sessionList.Add(new Session
-                {
-                    id = reader.GetInt32(0),
-                    StageId = reader.GetInt32(1),
-                    DJId = reader.GetInt32(2),
-                    StartTime = reader.GetDateTime(3),
-                    EndTime = reader.GetDateTime(4)
-                });
-            }
-        
-            await reader.CloseAsync();
-            await connection.CloseAsync();
+            await PlannerManager.Init();
+            _sessionList.AddRange(PlannerManager._sessionList);
+            _djList.AddRange(PlannerManager._djList);
+            _stageList.AddRange(PlannerManager._stageList);
             _filteredSessions.AddRange(_sessionList);
+            _loading = false;
             StateHasChanged();
         }
     }

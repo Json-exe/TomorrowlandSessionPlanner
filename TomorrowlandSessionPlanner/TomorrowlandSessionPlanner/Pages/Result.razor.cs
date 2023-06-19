@@ -22,7 +22,6 @@ public partial class Result
         if (firstRender)
         {
             _sortedSessions = PlannerManager.AddedSessions.OrderBy(s => s.StartTime).ToList();
-            await Task.Delay(2500);
             _loading = false;
             StateHasChanged();
         }
