@@ -1,0 +1,91 @@
+﻿@inject PlannerManager PlannerManager
+
+@code {
+
+    [CascadingParameter]
+    MudDialogInstance? MudDialog { get; set; }
+
+    [Parameter]
+    public List<Session> SupplementSessions { get; set; } = new();
+
+    private readonly DateTime _weekend2Start = new(2023, 7, 28, 00, 0, 0);
+    private readonly DateTime _weekend1Start = new(2023, 7, 21, 00, 0, 0);
+
+    private void AddSessionToUser(Session session)
+    {
+        PlannerManager.AddedSessions.Add(session);
+        SupplementSessions = PlannerManager._sessionList.Where(s => !PlannerManager.AddedSessions.Any(ss => IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Any(session1 => session1.id != s.id))).ToList();
+        StateHasChanged();
+    }
+
+    private bool IsSessionOverlapping(Session session1, Session session2)
+    {
+        if (session1.EndTime > session2.StartTime && session1.StartTime < session2.EndTime)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+}
+
+<MudDialog>
+    <DialogContent>
+        <MudExpansionPanels MultiExpansion="true">
+            <MudExpansionPanel>
+                <TitleContent>
+                    <MudText Align="Align.Center" Typo="Typo.h4">Weekend 1</MudText>
+                </TitleContent>
+                <ChildContent>
+                    <MudTable Items="SupplementSessions.Where(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start)" Bordered="true" Dense="true" Outlined="true">
+                        <HeaderContent>
+                            <MudTh>Stage</MudTh>
+                            <MudTh>DJ</MudTh>
+                            <MudTh>Start</MudTh>
+                            <MudTh>End</MudTh>
+                            <MudTh>Action</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Stage">@PlannerManager._stageList.First(x => x.id == context.StageId).Name</MudTd>
+                            <MudTd DataLabel="DJ">@PlannerManager._djList.First(x => x.id == context.DJId).Name</MudTd>
+                            <MudTd DataLabel="Start">@context.StartTime</MudTd>
+                            <MudTd DataLabel="End">@context.EndTime</MudTd>
+                            <MudTd DataLabel="Action">
+                                <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Text" Color="Color.Success" OnClick="() => AddSessionToUser(context)"/>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </ChildContent>
+            </MudExpansionPanel>
+            <MudExpansionPanel>
+                <TitleContent>
+                    <MudText Align="Align.Center" Typo="Typo.h4">Weekend 2</MudText>
+                </TitleContent>
+                <ChildContent>
+                    <MudTable Items="SupplementSessions.Where(x => x.StartTime >= _weekend2Start)" Bordered="true" Dense="true" Outlined="true">
+                        <HeaderContent>
+                            <MudTh>Stage</MudTh>
+                            <MudTh>DJ</MudTh>
+                            <MudTh>Start</MudTh>
+                            <MudTh>End</MudTh>
+                            <MudTh>Action</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Stage">@PlannerManager._stageList.First(x => x.id == context.StageId).Name</MudTd>
+                            <MudTd DataLabel="DJ">@PlannerManager._djList.First(x => x.id == context.DJId).Name</MudTd>
+                            <MudTd DataLabel="Start">@context.StartTime</MudTd>
+                            <MudTd DataLabel="End">@context.EndTime</MudTd>
+                            <MudTd DataLabel="Action">
+                                <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Text" Color="Color.Success" OnClick="() => AddSessionToUser(context)"/>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </ChildContent>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="() => MudDialog?.Close()">Close</MudButton>
+    </DialogActions>
+</MudDialog>

@@ -1,9 +1,13 @@
 ﻿using Aspose.Pdf;
 using Aspose.Pdf.Text;
 using Microsoft.JSInterop;
+using MudBlazor;
 using Newtonsoft.Json;
 using TomorrowlandSessionPlanner.Code;
+using TomorrowlandSessionPlanner.Dialogs;
 using TomorrowlandSessionPlanner.Models;
+using Color = Aspose.Pdf.Color;
+using HorizontalAlignment = Aspose.Pdf.HorizontalAlignment;
 
 namespace TomorrowlandSessionPlanner.Pages;
 
@@ -17,7 +21,6 @@ public partial class Result
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
         _jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Pages/Result.razor.js");
         if (firstRender)
         {
@@ -27,6 +30,30 @@ public partial class Result
         }
     }
 
+    private async void ShowSupplements()
+    {
+        var allSessions = PlannerManager._sessionList.Where(s => !PlannerManager.AddedSessions.Any(ss => IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Any(session => session.id != s.id))).ToList();
+        var dialogParameters = new DialogParameters
+        {
+            {"supplementSessions", allSessions}
+        };
+        await DialogService.ShowAsync<SupplementSessionsDialog>("Supplement Sessions", dialogParameters, new DialogOptions { CloseButton = false, MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true, CloseOnEscapeKey = false, DisableBackdropClick = true });
+        _sortedSessions = PlannerManager.AddedSessions.OrderBy(s => s.StartTime).ToList();
+        StateHasChanged();
+    }
+
+    private bool IsSessionOverlapping(Session session1, Session session2)
+    {
+        // Überprüfen, ob das Ende von session1 nach dem Start von session2 liegt und
+        // das Start von session1 vor dem Ende von session2 liegt
+        if (session1.EndTime > session2.StartTime && session1.StartTime < session2.EndTime)
+        {
+            return true;
+        }
+
+        return false;
+    }
+    
     private async void DownloadFile()
     {
         var json = JsonConvert.SerializeObject(_sortedSessions, Formatting.Indented);

@@ -37,9 +37,12 @@
         _drawerOpen = !_drawerOpen;
     }
 
-    protected override void OnInitialized()
+    protected override void OnAfterRender(bool firstRender)
     {
-        NavigationManager.NavigateTo("/");
+        if (firstRender)
+        {
+            NavigationManager.NavigateTo("/");
+        }
     }
 }
 

@@ -1,9 +1,9 @@
 ﻿@page "/Result"
-@using TomorrowlandSessionPlanner.Code
 @using System.Globalization
 @inject PlannerManager PlannerManager
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
+@inject IDialogService DialogService
 
 <PageTitle>Result</PageTitle>
 
@@ -76,7 +76,8 @@ else
     <MudText Align="Align.Center" Typo="Typo.h5" GutterBottom="true">Du kannst nun auswählen ob du eine HTML oder eine Daten Datei herunterladen möchtest. Die HTML Datei enthält eine Tabelle mit dem Plan, die Daten Datei
          kannst du jederzeit hier wieder Importieren, einsehen und anpassen.</MudText>
     <MudGrid Justify="Justify.Center" Class="mb-3 mt-3" Spacing="2">
-        <MudButton Size="Size.Large" OnClick="DownloadFile" Variant="Variant.Filled" Color="Color.Info" FullWidth="false" Style="width: 200px;">Download Daten</MudButton>
+        <MudButton Size="Size.Large" Variant="Variant.Filled" Color="Color.Info" FullWidth="false" OnClick="ShowSupplements" Style="width: 200px;">Ergänzungen zeigen</MudButton>
+        <MudButton Size="Size.Large" Class="ml-2" OnClick="DownloadFile" Variant="Variant.Filled" Color="Color.Info" FullWidth="false" Style="width: 200px;">Download Daten</MudButton>
         <MudButton Size="Size.Large" Class="ml-2" OnClick="DownloadHtmlFile" Variant="Variant.Filled" Color="Color.Info" FullWidth="false" Style="width: 200px;">Download HTML</MudButton>
         <MudButton Size="Size.Large" Class="ml-2" OnClick="@(() => NavigationManager.NavigateTo("/"))" Variant="Variant.Filled" Color="Color.Info" FullWidth="false" Style="width: 200px;">Plan anpassen</MudButton>
     </MudGrid>
