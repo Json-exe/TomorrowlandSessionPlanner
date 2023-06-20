@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-@inject PlannerManager PlannerManager
+@inject NavigationManager NavigationManager
 
 <PageTitle>Tomorrowland Session Planner</PageTitle>
 
@@ -35,6 +35,11 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.NavigateTo("/");
     }
 }
 
