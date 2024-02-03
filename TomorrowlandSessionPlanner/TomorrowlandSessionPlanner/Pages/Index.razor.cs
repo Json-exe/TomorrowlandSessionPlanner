@@ -1,9 +1,10 @@
-﻿using MudBlazor;
+﻿using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using TomorrowlandSessionPlanner.Models;
 
 namespace TomorrowlandSessionPlanner.Pages;
 
-public partial class Index
+public partial class Index : ComponentBase
 {
     private readonly List<Dj> _djList = new();
     private readonly List<Stage> _stageList = new();
@@ -31,7 +32,8 @@ public partial class Index
     
     private Task<IEnumerable<string>> DjSearch(string arg)
     {
-        return Task.FromResult(string.IsNullOrEmpty(arg) ? _djList.Select(x => x.Name) : _djList.Where(x => x.Name.Contains(arg, StringComparison.InvariantCultureIgnoreCase)).Select(x => x.Name));
+        return Task.FromResult(string.IsNullOrEmpty(arg) ? _djList.Select(x => x.Name) : 
+            _djList.Where(x => x.Name.Contains(arg, StringComparison.InvariantCultureIgnoreCase)).Select(x => x.Name));
     }
     
     private void ApplyFilters()
@@ -77,15 +79,5 @@ public partial class Index
     private static string ToStringFunc(Stage arg)
     {
         return arg.Name;
-    }
-    
-    private void AddUserSession(Session session)
-    {
-        PlannerManager.AddedSessions.Add(session);
-    }
-    
-    private void RemoveUserSession(Session session)
-    {
-        PlannerManager.AddedSessions.Remove(session);
     }
 }

@@ -59,6 +59,11 @@ public partial class SessionPlan : ComponentBase
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
+        if (PlannerManager.AddedSessions.Count == 0)
+        {
+            NavigationManager.NavigateTo("/", true, true);
+            return;
+        }
         await CheckSessions();
     }
 
@@ -82,11 +87,9 @@ public partial class SessionPlan : ComponentBase
     //
     //     return false;
     // }
-
-    private async void RemoveUserSession(Session session)
+    
+    private async Task SessionRemoved()
     {
-        PlannerManager.AddedSessions.Remove(session);
-        Snackbar.Add("Session aus deinem Plan entfernt", Severity.Success);
         // TODO: Check if everytime a session is removed we have to recheck everything or do it only if user wants it.
         await CheckSessions();
     }

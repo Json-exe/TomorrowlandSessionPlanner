@@ -1,5 +1,6 @@
 ﻿using Aspose.Pdf;
 using Aspose.Pdf.Text;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 using Newtonsoft.Json;
@@ -11,11 +12,11 @@ using HorizontalAlignment = Aspose.Pdf.HorizontalAlignment;
 
 namespace TomorrowlandSessionPlanner.Pages;
 
-public partial class Result
+public partial class Result : ComponentBase, IAsyncDisposable
 {
     private bool _loading = true;
     private List<Session> _sortedSessions = new();
-    private IJSObjectReference _jsModule = null!;
+    private IJSObjectReference? _jsModule;
     private readonly DateTime _weekend2Start = new(2023, 7, 28, 00, 0, 0);
     private readonly DateTime _weekend1Start = new(2023, 7, 21, 00, 0, 0);
 
@@ -24,6 +25,12 @@ public partial class Result
         _jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Pages/Result.razor.js");
         if (firstRender)
         {
+            if (PlannerManager.AddedSessions.Count == 0)
+            {
+                NavigationManager.NavigateTo("/", true, true);
+                return;
+            }
+
             _sortedSessions = PlannerManager.AddedSessions.OrderBy(s => s.StartTime).ToList();
             _loading = false;
             StateHasChanged();
@@ -32,53 +39,59 @@ public partial class Result
 
     private async void ShowSupplements()
     {
-        var allSessions = PlannerManager.SessionList.Where(s => !PlannerManager.AddedSessions.Any(ss => IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Any(session => session.id != s.id))).ToList();
+        var allSessions = PlannerManager.SessionList.Where(s => !PlannerManager.AddedSessions.Any(ss =>
+            IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Any(session => session.id != s.id))).ToList();
         var dialogParameters = new DialogParameters
         {
-            {"supplementSessions", allSessions}
+            { "supplementSessions", allSessions }
         };
-        await DialogService.ShowAsync<SupplementSessionsDialog>("Supplement Sessions", dialogParameters, new DialogOptions { CloseButton = false, MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true, CloseOnEscapeKey = false, DisableBackdropClick = true });
+        await DialogService.ShowAsync<SupplementSessionsDialog>("Supplement Sessions", dialogParameters,
+            new DialogOptions
+            {
+                CloseButton = false, MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true, CloseOnEscapeKey = false,
+                DisableBackdropClick = true
+            });
         _sortedSessions = PlannerManager.AddedSessions.OrderBy(s => s.StartTime).ToList();
         StateHasChanged();
     }
 
-    private bool IsSessionOverlapping(Session session1, Session session2)
+    private static bool IsSessionOverlapping(Session session1, Session session2)
     {
         // Überprüfen, ob das Ende von session1 nach dem Start von session2 liegt und
         // das Start von session1 vor dem Ende von session2 liegt
-        if (session1.EndTime > session2.StartTime && session1.StartTime < session2.EndTime)
-        {
-            return true;
-        }
-
-        return false;
+        return session1.EndTime > session2.StartTime && session1.StartTime < session2.EndTime;
     }
-    
+
     private async void DownloadFile()
     {
         var json = JsonConvert.SerializeObject(_sortedSessions, Formatting.Indented);
-        var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.tmlplanner");
+        var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data",
+            $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.tmlplanner");
         await File.WriteAllTextAsync(savePath, json);
         var bites = await File.ReadAllBytesAsync(savePath);
         var fileName = Path.GetFileName(savePath);
-        await _jsModule.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
+        if (_jsModule != null) 
+            await _jsModule.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
         File.Delete(savePath);
     }
 
     private async void DownloadHtmlFile()
     {
-        var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.html");
+        var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data",
+            $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.html");
         var html = await new HTMLCreator().CreateHTMLTable(_sortedSessions, PlannerManager);
         await File.WriteAllTextAsync(savePath, html);
         var bites = await File.ReadAllBytesAsync(savePath);
         var fileName = Path.GetFileName(savePath);
-        await _jsModule.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
+        if (_jsModule != null) 
+            await _jsModule.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
         File.Delete(savePath);
     }
 
     private async void DownloadPdfFile()
     {
-        var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.pdf");
+        var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data",
+            $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.pdf");
         var document = new Document();
         var page = document.Pages.Add();
         var table = new Table
@@ -101,21 +114,32 @@ public partial class Result
             row.Cells.Add(sortedSession.StartTime.ToString("dd-MM-yyyy HH:mm"));
             row.Cells.Add(sortedSession.EndTime.ToString("dd-MM-yyyy HH:mm"));
         }
-        
+
         // Create a title text for the PDF
-        var title = new TextFragment("Tomorrowland Session Planner");
-        title.TextState.FontSize = 20;
-        title.TextState.FontStyle = FontStyles.Bold;
-        title.TextState.ForegroundColor = Color.FromRgb(System.Drawing.Color.Black);
-        title.HorizontalAlignment = HorizontalAlignment.Center;
-        
+        var title = new TextFragment("Tomorrowland Session Planner")
+        {
+            TextState =
+            {
+                FontSize = 20,
+                FontStyle = FontStyles.Bold,
+                ForegroundColor = Color.FromRgb(System.Drawing.Color.Black)
+            },
+            HorizontalAlignment = HorizontalAlignment.Center
+        };
+
         page.Paragraphs.Add(title);
         page.Paragraphs.Add(table);
-        
+
         document.Save(savePath);
         var bites = await File.ReadAllBytesAsync(savePath);
         var fileName = Path.GetFileName(savePath);
-        await _jsModule.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
+        if (_jsModule != null) 
+            await _jsModule.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
         File.Delete(savePath);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule != null) await _jsModule.DisposeAsync();
     }
 }
