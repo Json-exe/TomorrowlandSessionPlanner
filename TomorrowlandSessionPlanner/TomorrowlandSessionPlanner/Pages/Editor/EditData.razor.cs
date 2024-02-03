@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
-using Newtonsoft.Json;
 using TomorrowlandSessionPlanner.DBContext;
 using TomorrowlandSessionPlanner.Dialogs;
 using TomorrowlandSessionPlanner.Models;
@@ -98,7 +98,7 @@ public partial class EditData : ComponentBase
 
             var fileContent = file.OpenReadStream();
             var json = await new StreamReader(fileContent).ReadToEndAsync();
-            var sessionsToImport = JsonConvert.DeserializeObject<List<SessionImportModel>>(json);
+            var sessionsToImport = JsonSerializer.Deserialize<List<SessionImportModel>>(json);
             if (sessionsToImport == null)
             {
                 throw new Exception("No Sessions found!");
@@ -136,7 +136,7 @@ public partial class EditData : ComponentBase
 
             var fileContent = file.OpenReadStream();
             var json = await new StreamReader(fileContent).ReadToEndAsync();
-            var sessionsToImport = JsonConvert.DeserializeObject<List<SessionImportModel>>(json);
+            var sessionsToImport = JsonSerializer.Deserialize<List<SessionImportModel>>(json);
             if (sessionsToImport == null)
             {
                 throw new Exception("No Sessions found!");
@@ -242,7 +242,7 @@ public partial class EditData : ComponentBase
 
             var fileContent = file.OpenReadStream();
             var json = await new StreamReader(fileContent).ReadToEndAsync();
-            var sessionsToImport = JsonConvert.DeserializeObject<List<SessionImportModel>>(json);
+            var sessionsToImport = JsonSerializer.Deserialize<List<SessionImportModel>>(json);
             if (sessionsToImport == null)
             {
                 throw new Exception("No Sessions found!");

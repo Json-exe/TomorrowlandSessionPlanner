@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
-using Newtonsoft.Json;
 using TomorrowlandSessionPlanner.Code;
 using TomorrowlandSessionPlanner.Dialogs;
 using TomorrowlandSessionPlanner.Models;
@@ -64,7 +64,7 @@ public partial class Result : ComponentBase, IAsyncDisposable
     /// <returns>A task representing the asynchronous operation.</returns>
     private async void DownloadFile()
     {
-        var json = JsonConvert.SerializeObject(_sortedSessions, Formatting.Indented);
+        var json = JsonSerializer.Serialize(_sortedSessions);
         var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data",
             $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.tmlplanner");
         await File.WriteAllTextAsync(savePath, json);

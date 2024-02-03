@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
-using Newtonsoft.Json;
 using TomorrowlandSessionPlanner.Models;
 
 namespace TomorrowlandSessionPlanner.Pages;
@@ -22,7 +22,7 @@ public partial class UploadPlan : ComponentBase
             }
             var fileContent = file.OpenReadStream();
             var json = await new StreamReader(fileContent).ReadToEndAsync();
-            var sessions = JsonConvert.DeserializeObject<List<Session>>(json);
+            var sessions = JsonSerializer.Deserialize<List<Session>>(json);
             if (sessions == null)
             {
                 throw new NullReferenceException("No Sessions found!");
