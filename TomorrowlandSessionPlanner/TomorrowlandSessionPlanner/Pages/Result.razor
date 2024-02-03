@@ -23,7 +23,7 @@ else
                 @foreach (var session in _sortedSessions.Where(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
                 {
                     <MudTimelineItem Size="Size.Medium" Variant="Variant.Outlined" Color="Color.Info" 
-                                     TimelineAlign="TimelineAlign.Default" Style="width: 1000px;" @key="session.id">
+                                     TimelineAlign="TimelineAlign.Default" Style="width: 1000px;" @key="session.Id">
                         <SessionCard Session="session" IsReadonly/>
                     </MudTimelineItem>
                 }
@@ -39,7 +39,7 @@ else
                 @foreach (var session in _sortedSessions.Where(x => x.StartTime >= _weekend2Start))
                 {
                     <MudTimelineItem Size="Size.Medium" Variant="Variant.Outlined" Color="Color.Info" 
-                                     TimelineAlign="TimelineAlign.Default" Style="width: 1000px;" @key="session.id">
+                                     TimelineAlign="TimelineAlign.Default" Style="width: 1000px;" @key="session.Id">
                         <SessionCard Session="session" IsReadonly/>
                     </MudTimelineItem>
                 }

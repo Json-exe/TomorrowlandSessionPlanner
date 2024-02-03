@@ -49,20 +49,20 @@ public partial class Index : ComponentBase
         if (_stageFilter.Any() && !string.IsNullOrEmpty(_djFilter))
         {
             if (dj == null) return;
-            _filteredSessions = _sessionList.Where(x => _stageFilter.Any(y => y.id == x.StageId) && x.DJId == dj.id).ToList();
+            _filteredSessions = _sessionList.Where(x => _stageFilter.Any(y => y.Id == x.StageId) && x.DjId == dj.Id).ToList();
             StateHasChanged();
             return;
         }
         // Filter by stage
         if (_stageFilter.Any())
         {
-            _filteredSessions = _sessionList.Where(x => _stageFilter.Any(y => y.id == x.StageId)).ToList();
+            _filteredSessions = _sessionList.Where(x => _stageFilter.Any(y => y.Id == x.StageId)).ToList();
             StateHasChanged();
             return;
         }
         // Filter by dj
         if (dj == null) return;
-        _filteredSessions = _sessionList.Where(x => _djFilter != null && x.DJId == dj.id).ToList();
+        _filteredSessions = _sessionList.Where(x => _djFilter != null && x.DjId == dj.Id).ToList();
         StateHasChanged();
     }
     

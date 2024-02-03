@@ -1,7 +1,7 @@
 ﻿namespace TomorrowlandSessionPlanner.Models;
 
-public class OverlappingSession
+public sealed record OverlappingSession
 {
-    public Session Session { get; set; } = new();
-    public List<Session> OverlappingSessions { get; set; } = new();
+    public Session Session { get; init; } = new();
+    public List<Session> OverlappingSessions { get; init; } = new();
 }

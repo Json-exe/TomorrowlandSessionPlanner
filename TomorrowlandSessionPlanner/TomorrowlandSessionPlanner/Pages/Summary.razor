@@ -11,7 +11,7 @@
 <MudGrid Spacing="2" Justify="Justify.Center">
     @foreach (var session in PlannerManager.AddedSessions)
     {
-        <SessionCard Class="ml-5 mb-5" Session="session" IsReadonly @key="session.id"/>
+        <SessionCard Class="ml-5 mb-5" Session="session" IsReadonly @key="session.Id"/>
     }
 </MudGrid>
 

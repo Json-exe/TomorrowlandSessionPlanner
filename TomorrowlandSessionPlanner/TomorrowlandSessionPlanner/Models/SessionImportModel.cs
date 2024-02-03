@@ -1,9 +1,9 @@
 ﻿namespace TomorrowlandSessionPlanner.Models;
 
-public class SessionImportModel
+public sealed record SessionImportModel
 {
-    public string StageName { get; set; }
-    public string DJName { get; set; }
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
+    public string StageName { get; set; } = string.Empty;
+    public readonly string DjName = string.Empty;
+    public DateTime StartTime = DateTime.Now;
+    public DateTime EndTime = DateTime.Now;
 }

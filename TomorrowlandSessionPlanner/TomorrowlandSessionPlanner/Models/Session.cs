@@ -1,10 +1,10 @@
 ﻿namespace TomorrowlandSessionPlanner.Models;
 
-public class Session
+public sealed record Session
 {
-    public int id { get; set; }
-    public int StageId { get; set; }
-    public int DJId { get; set; }
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
+    public int Id { get; init; }
+    public int StageId { get; init; }
+    public int DjId { get; set; }
+    public DateTime StartTime { get; init; }
+    public DateTime EndTime { get; init; }
 }

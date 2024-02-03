@@ -26,7 +26,7 @@ public class PlannerManager
         {
             DjList.Add(new Dj
             {
-                id = reader.GetInt32(0),
+                Id = reader.GetInt32(0),
                 Name = reader.GetString(1)
             });
         }
@@ -40,7 +40,7 @@ public class PlannerManager
         {
             StageList.Add(new Stage
             {
-                id = reader.GetInt32(0),
+                Id = reader.GetInt32(0),
                 Name = reader.GetString(1)
             });
         }
@@ -55,9 +55,9 @@ public class PlannerManager
         {
             SessionList.Add(new Session
             {
-                id = reader.GetInt32(0),
+                Id = reader.GetInt32(0),
                 StageId = reader.GetInt32(1),
-                DJId = reader.GetInt32(2),
+                DjId = reader.GetInt32(2),
                 StartTime = reader.GetDateTime(3),
                 EndTime = reader.GetDateTime(4)
             });

@@ -52,7 +52,7 @@
                             }
                             @foreach (var session in _filteredSessions.Where(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
                             {
-                                <SessionCard @key="session.id" Class="ml-5 mb-5" Session="session"/>
+                                <SessionCard @key="session.Id" Class="ml-5 mb-5" Session="session"/>
                             }
                         }
                     </MudGrid>
@@ -96,7 +96,7 @@
                             }
                             @foreach (var session in _filteredSessions.Where(x => x.StartTime >= _weekend2Start))
                             {
-                                <SessionCard @key="session.id" Class="ml-5 mb-5" Session="session"/>
+                                <SessionCard @key="session.Id" Class="ml-5 mb-5" Session="session"/>
                             }
                         }
                     </MudGrid>

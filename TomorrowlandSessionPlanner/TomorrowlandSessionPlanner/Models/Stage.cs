@@ -1,7 +1,7 @@
 ﻿namespace TomorrowlandSessionPlanner.Models;
 
-public class Stage
+public sealed record Stage
 {
-    public int id { get; set; }
-    public string Name { get; set; }
+    public int Id { get; init; }
+    public string Name { get; init; } = string.Empty;
 }

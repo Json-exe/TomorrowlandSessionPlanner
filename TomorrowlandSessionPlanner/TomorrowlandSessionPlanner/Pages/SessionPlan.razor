@@ -18,7 +18,7 @@ else
     <MudGrid Spacing="2" Justify="Justify.Center">
         @foreach (var overlappingSession in _overlappingSessions)
         {
-            <SessionAnalyzeDetailCard OverlappingSession="overlappingSession" @key="overlappingSession.Session.id"
+            <SessionAnalyzeDetailCard OverlappingSession="overlappingSession" @key="overlappingSession.Session.Id"
                                       SessionRemoved="SessionRemoved"/>
         }
     </MudGrid>

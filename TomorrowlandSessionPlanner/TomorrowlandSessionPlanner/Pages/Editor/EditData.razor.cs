@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Data.Sqlite;
 using MudBlazor;
 using Newtonsoft.Json;
@@ -7,7 +8,7 @@ using TomorrowlandSessionPlanner.Models;
 
 namespace TomorrowlandSessionPlanner.Pages.Editor;
 
-public partial class EditData
+public partial class EditData : ComponentBase
 {
     private readonly List<Dj> _djList = new();
     private readonly List<Stage> _stageList = new();
@@ -16,7 +17,7 @@ public partial class EditData
     private int _selectedStage;
     private DateTime? _startDate;
     private string? _newDj;
-    private const bool IsAccessible = false;
+    private const bool IsAccessible = true;
 
     private async void AddSession()
     {
@@ -48,7 +49,7 @@ public partial class EditData
                 "INSERT INTO Sessions (StageId, DJId, StartTime, EndTime) VALUES (@StageId, @DJId, @StartTime, @EndTime)",
                 connection);
         command.Parameters.AddWithValue("@StageId", session.StageId);
-        command.Parameters.AddWithValue("@DJId", session.DJId);
+        command.Parameters.AddWithValue("@DJId", session.DjId);
         command.Parameters.AddWithValue("@StartTime", session.StartTime);
         command.Parameters.AddWithValue("@EndTime", session.EndTime);
         await command.ExecuteNonQueryAsync();
@@ -79,7 +80,7 @@ public partial class EditData
             {
                 _djList.Add(new Dj
                 {
-                    id = reader.GetInt32(0),
+                    Id = reader.GetInt32(0),
                     Name = reader.GetString(1)
                 });
             }
@@ -93,7 +94,7 @@ public partial class EditData
             {
                 _stageList.Add(new Stage
                 {
-                    id = reader.GetInt32(0),
+                    Id = reader.GetInt32(0),
                     Name = reader.GetString(1)
                 });
             }
@@ -108,9 +109,9 @@ public partial class EditData
             {
                 _sessionList.Add(new Session
                 {
-                    id = reader.GetInt32(0),
+                    Id = reader.GetInt32(0),
                     StageId = reader.GetInt32(1),
-                    DJId = reader.GetInt32(2),
+                    DjId = reader.GetInt32(2),
                     StartTime = reader.GetDateTime(3),
                     EndTime = reader.GetDateTime(4)
                 });
@@ -123,7 +124,7 @@ public partial class EditData
         }
     }
 
-    private async void ImportDj(IBrowserFile file)
+    private async void ImportDj(IBrowserFile? file)
     {
         try
         {
@@ -167,10 +168,10 @@ public partial class EditData
         var newDjsData = new List<Dj>();
         foreach (var djImportModel in dj)
         {
-            if (_djList.Any(x => x.Name == djImportModel.DJName) || newDjs.Any(x => x.DJName == djImportModel.DJName)) continue;
+            if (_djList.Any(x => x.Name == djImportModel.DjName) || newDjs.Any(x => x.DjName == djImportModel.DjName)) continue;
             var newDj = new Dj
             {
-                Name = djImportModel.DJName
+                Name = djImportModel.DjName
             };
             newDjsData.Add(newDj);
             newDjs.Add(djImportModel);
@@ -195,7 +196,7 @@ public partial class EditData
         }
     }
 
-    private async void ImportSessions(IBrowserFile file)
+    private async void ImportSessions(IBrowserFile? file)
     {
         try
         {
@@ -246,11 +247,11 @@ public partial class EditData
             {
                 sessionImportModel.StageName = sessionImportModel.StageName.ToUpper() == "CORE" ? sessionImportModel.StageName.ToUpper() : sessionImportModel.StageName;
                 var stage = _stageList.First(x => x.Name == sessionImportModel.StageName);
-                var dj = _djList.First(x => x.Name == sessionImportModel.DJName);
+                var dj = _djList.First(x => x.Name == sessionImportModel.DjName);
                 var session = new Session
                 {
-                    StageId = stage.id,
-                    DJId = dj.id,
+                    StageId = stage.Id,
+                    DjId = dj.Id,
                     StartTime = sessionImportModel.StartTime,
                     EndTime = sessionImportModel.EndTime
                 };
@@ -263,7 +264,7 @@ public partial class EditData
                         x.StageId == session.StageId && x.StartTime == session.StartTime &&
                         x.EndTime == session.EndTime);
 
-                    if (existingSession.DJId != session.DJId)
+                    if (existingSession.DjId != session.DjId)
                     {
                         updatedSessions.Add(sessionImportModel);
                         updatedSessionsImportData.Add(session);
@@ -323,7 +324,7 @@ public partial class EditData
                 "UPDATE Sessions SET DJId = @DJId WHERE StageId = @StageId AND StartTime = @StartTime AND EndTime = @EndTime",
                 connection);
         command.Parameters.AddWithValue("@StageId", session.StageId);
-        command.Parameters.AddWithValue("@DJId", session.DJId);
+        command.Parameters.AddWithValue("@DJId", session.DjId);
         command.Parameters.AddWithValue("@StartTime", session.StartTime);
         command.Parameters.AddWithValue("@EndTime", session.EndTime);
         await command.ExecuteNonQueryAsync();
@@ -331,7 +332,7 @@ public partial class EditData
         _sessionList.First(x =>
                 x.StageId == session.StageId && x.StartTime == session.StartTime &&
                 x.EndTime == session.EndTime)
-            .DJId = session.DJId;
+            .DjId = session.DjId;
         Snackbar.Add("Session updated in database", Severity.Success);
     }
 
@@ -354,7 +355,7 @@ public partial class EditData
 
     private async void AddNewDj()
     {
-        if (string.IsNullOrEmpty(_newDj) || _djList.All(x => x.Name != _newDj)) return;
+        if (string.IsNullOrEmpty(_newDj) || _djList.Any(x => x.Name == _newDj)) return;
         var dj = new Dj
         {
             Name = _newDj

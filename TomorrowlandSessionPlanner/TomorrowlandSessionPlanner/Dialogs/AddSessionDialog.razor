@@ -8,7 +8,7 @@
             <MudSelect Required="true" @bind-Value="@_selectedStage" Variant="Variant.Outlined" Label="Select a Stage" Clearable="true">
                 @foreach (var item in Stages)
                 {
-                    <MudSelectItem Value="@item.id">@item.Name</MudSelectItem>
+                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
                 }
             </MudSelect>
             <MudGrid>
@@ -60,7 +60,7 @@
     protected override void OnAfterRender(bool firstRender)
     {
         if (!firstRender) return;
-        _selectedStage = PreSelectedStage >= 0 ? PreSelectedStage : Stages.First().id;
+        _selectedStage = PreSelectedStage >= 0 ? PreSelectedStage : Stages.First().Id;
         _startDate = PreSelectedDate;
         _endDate = PreSelectedDate;
         StateHasChanged();
@@ -76,7 +76,7 @@
         
         var session = new Session
         {
-            DJId = _selectedDj,
+            DjId = _selectedDj,
             StageId = _selectedStage,
             StartTime = _startDate.Value.Date + _startTime.Value,
             EndTime = _endDate.Value.Date + _endTime.Value
@@ -93,6 +93,6 @@
     private void DjChanged(string obj)
     {
         if (string.IsNullOrEmpty(obj)) return;
-        _selectedDj = Djs.First(x => x.Name == obj).id;
+        _selectedDj = Djs.First(x => x.Name == obj).Id;
     }
 }

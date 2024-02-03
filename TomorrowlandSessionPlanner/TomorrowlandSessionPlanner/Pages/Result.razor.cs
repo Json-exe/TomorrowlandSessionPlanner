@@ -1,14 +1,10 @@
-﻿using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 using Newtonsoft.Json;
 using TomorrowlandSessionPlanner.Code;
 using TomorrowlandSessionPlanner.Dialogs;
 using TomorrowlandSessionPlanner.Models;
-using Color = Aspose.Pdf.Color;
-using HorizontalAlignment = Aspose.Pdf.HorizontalAlignment;
 
 namespace TomorrowlandSessionPlanner.Pages;
 
@@ -40,7 +36,7 @@ public partial class Result : ComponentBase, IAsyncDisposable
     private async void ShowSupplements()
     {
         var allSessions = PlannerManager.SessionList.Where(s => !PlannerManager.AddedSessions.Any(ss =>
-            IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Any(session => session.id != s.id))).ToList();
+            IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Any(session => session.Id != s.Id))).ToList();
         var dialogParameters = new DialogParameters
         {
             { "supplementSessions", allSessions }
@@ -61,7 +57,11 @@ public partial class Result : ComponentBase, IAsyncDisposable
         // das Start von session1 vor dem Ende von session2 liegt
         return session1.EndTime > session2.StartTime && session1.StartTime < session2.EndTime;
     }
-
+    
+    /// <summary>
+    /// Downloads a file by serializing a sorted list of sessions as JSON and saving it to a file.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     private async void DownloadFile()
     {
         var json = JsonConvert.SerializeObject(_sortedSessions, Formatting.Indented);
