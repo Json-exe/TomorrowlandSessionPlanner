@@ -2,9 +2,11 @@
 
 public sealed record Session
 {
-    public int Id { get; init; }
-    public int StageId { get; init; }
+    public int Id { get; set; }
+    public int StageId { get; set; }
     public int DjId { get; set; }
-    public DateTime StartTime { get; init; }
-    public DateTime EndTime { get; init; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public Stage? Stage { get; private set; }
+    public Dj? Dj { get; private set; }
 }

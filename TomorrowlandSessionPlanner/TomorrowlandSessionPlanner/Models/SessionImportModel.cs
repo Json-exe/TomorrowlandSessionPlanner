@@ -3,7 +3,7 @@
 public sealed record SessionImportModel
 {
     public string StageName { get; set; } = string.Empty;
-    public readonly string DjName = string.Empty;
-    public DateTime StartTime = DateTime.Now;
-    public DateTime EndTime = DateTime.Now;
+    public string DjName { get; set; } = string.Empty;
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
 }

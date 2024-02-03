@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using Newtonsoft.Json;
+using TomorrowlandSessionPlanner.DBContext;
 using TomorrowlandSessionPlanner.Dialogs;
 using TomorrowlandSessionPlanner.Models;
 
@@ -10,6 +12,8 @@ namespace TomorrowlandSessionPlanner.Pages.Editor;
 
 public partial class EditData : ComponentBase
 {
+    [Inject] public required IDbContextFactory<TmldbContext> DbContextFactory { get; set; }
+    
     private readonly List<Dj> _djList = new();
     private readonly List<Stage> _stageList = new();
     private readonly List<Session> _sessionList = new();
@@ -40,22 +44,10 @@ public partial class EditData : ComponentBase
 
     private async Task AddSessionToDatabase(Session session)
     {
-        var currentDirectory = Directory.GetCurrentDirectory();
-        var databasePath = Path.Combine(currentDirectory, "Data", "tmldata.db");
-        await using var connection = new SqliteConnection($"Data Source={databasePath}");
-        await connection.OpenAsync();
-        var command =
-            new SqliteCommand(
-                "INSERT INTO Sessions (StageId, DJId, StartTime, EndTime) VALUES (@StageId, @DJId, @StartTime, @EndTime)",
-                connection);
-        command.Parameters.AddWithValue("@StageId", session.StageId);
-        command.Parameters.AddWithValue("@DJId", session.DjId);
-        command.Parameters.AddWithValue("@StartTime", session.StartTime);
-        command.Parameters.AddWithValue("@EndTime", session.EndTime);
-        await command.ExecuteNonQueryAsync();
-        await connection.CloseAsync();
+        var dbContext = await DbContextFactory.CreateDbContextAsync();
+        await dbContext.Sessions.AddAsync(session);
+        await dbContext.SaveChangesAsync();
         _sessionList.Add(session);
-        Snackbar.Add("Session added to database", Severity.Success);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -68,57 +60,23 @@ public partial class EditData : ComponentBase
 
         if (firstRender)
         {
-            var currentDirectory = Directory.GetCurrentDirectory();
-            var databasePath = Path.Combine(currentDirectory, "Data", "tmldata.db");
-            await using var connection = new SqliteConnection($"Data Source={databasePath}");
-            await connection.OpenAsync();
+            var dbContext = await DbContextFactory.CreateDbContextAsync();
 
-            var command = new SqliteCommand("SELECT * FROM DJs", connection);
-            var reader = await command.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
+            foreach (var dj in dbContext.Djs)
             {
-                _djList.Add(new Dj
-                {
-                    Id = reader.GetInt32(0),
-                    Name = reader.GetString(1)
-                });
+                _djList.Add(dj);
             }
 
-            await reader.CloseAsync();
-
-            command = new SqliteCommand("SELECT * FROM Stages", connection);
-            reader = await command.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
+            foreach (var stage in dbContext.Stages)
             {
-                _stageList.Add(new Stage
-                {
-                    Id = reader.GetInt32(0),
-                    Name = reader.GetString(1)
-                });
+                _stageList.Add(stage);
             }
 
-            await reader.CloseAsync();
-
-            command = new SqliteCommand("SELECT * FROM Sessions", connection);
-
-            reader = await command.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
+            foreach (var session in dbContext.Sessions)
             {
-                _sessionList.Add(new Session
-                {
-                    Id = reader.GetInt32(0),
-                    StageId = reader.GetInt32(1),
-                    DjId = reader.GetInt32(2),
-                    StartTime = reader.GetDateTime(3),
-                    EndTime = reader.GetDateTime(4)
-                });
+                _sessionList.Add(session);
             }
-
-            await reader.CloseAsync();
-            await connection.CloseAsync();
+            
             _loading = false;
             StateHasChanged();
         }
@@ -150,6 +108,44 @@ public partial class EditData : ComponentBase
                 $"Importing {sessionsToImport.Count} DJs this could take a while... Please wait until the import is finished!",
                 Severity.Info);
             await AnalyzeImportDJs(sessionsToImport);
+            Snackbar.Add("Import finished!", Severity.Success);
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            Snackbar.Add(
+                "Es ist ein Fehler beim importieren der Datei aufgetreten! Bitte stelle sicher das dies die Richtige Datei ist!",
+                Severity.Error);
+        }
+    }
+    
+    private async void ImportStages(IBrowserFile? file)
+    {
+        try
+        {
+            if (file == null)
+            {
+                throw new Exception("No File selected!");
+            }
+
+            if (!file.Name.EndsWith(".json"))
+            {
+                throw new Exception("Wrong File Format!");
+            }
+
+            var fileContent = file.OpenReadStream();
+            var json = await new StreamReader(fileContent).ReadToEndAsync();
+            var sessionsToImport = JsonConvert.DeserializeObject<List<SessionImportModel>>(json);
+            if (sessionsToImport == null)
+            {
+                throw new Exception("No Sessions found!");
+            }
+
+            Snackbar.Add(
+                $"Importing {sessionsToImport.Count} Stages this could take a while... Please wait until the import is finished!",
+                Severity.Info);
+            await AnalyzeImportStages(sessionsToImport);
             Snackbar.Add("Import finished!", Severity.Success);
             StateHasChanged();
         }
@@ -194,6 +190,40 @@ public partial class EditData : ComponentBase
         {
             await AddDj(djData);
         }
+    }
+    
+    private async Task AnalyzeImportStages(List<SessionImportModel> stages)
+    {
+        var newStages = new List<SessionImportModel>();
+        var newStagesData = new List<Stage>();
+        foreach (var stageImportModel in stages)
+        {
+            stageImportModel.StageName = stageImportModel.StageName.ToUpper() == "CORE"
+                ? stageImportModel.StageName.ToUpper()
+                : stageImportModel.StageName;
+            if (_stageList.Any(x => x.Name == stageImportModel.StageName) || newStages.Any(x => x.StageName == stageImportModel.StageName)) continue;
+            var newStage = new Stage
+            {
+                Name = stageImportModel.StageName
+            };
+            newStagesData.Add(newStage);
+            newStages.Add(stageImportModel);
+        }
+        
+        Snackbar.Add($"New Stages imports: {newStages.Count}", Severity.Success);
+        var dialog = await DialogService.ShowAsync<ImportSessionInfoDialog>("Import Info", new DialogParameters
+        {
+            { "newSessions", newStages },
+        }, new DialogOptions
+        {
+            CloseButton = false,
+            FullWidth = true,
+            CloseOnEscapeKey = false,
+            DisableBackdropClick = true
+        });
+        var result = await dialog.Result;
+        if (result.Canceled) return;
+        await AddStages(newStagesData);
     }
 
     private async void ImportSessions(IBrowserFile? file)
@@ -333,24 +363,22 @@ public partial class EditData : ComponentBase
                 x.StageId == session.StageId && x.StartTime == session.StartTime &&
                 x.EndTime == session.EndTime)
             .DjId = session.DjId;
-        Snackbar.Add("Session updated in database", Severity.Success);
     }
 
     private async Task AddDj(Dj dj)
     {
-        var currentDirectory = Directory.GetCurrentDirectory();
-        var databasePath = Path.Combine(currentDirectory, "Data", "tmldata.db");
-        await using var connection = new SqliteConnection($"Data Source={databasePath}");
-        await connection.OpenAsync();
-        var command =
-            new SqliteCommand(
-                "INSERT INTO DJs (Name) VALUES (@DJName)",
-                connection);
-        command.Parameters.AddWithValue("@DJName", dj.Name);
-        await command.ExecuteNonQueryAsync();
-        await connection.CloseAsync();
+        var dbContext = await DbContextFactory.CreateDbContextAsync();
+        await dbContext.Djs.AddAsync(dj);
+        await dbContext.SaveChangesAsync();
         _djList.Add(dj);
-        Snackbar.Add("DJ added to database", Severity.Success);
+    }
+    
+    private async Task AddStages(IReadOnlyCollection<Stage> stages)
+    {
+        var dbContext = await DbContextFactory.CreateDbContextAsync();
+        await dbContext.Stages.AddRangeAsync(stages);
+        await dbContext.SaveChangesAsync();
+        _stageList.AddRange(stages);
     }
 
     private async void AddNewDj()

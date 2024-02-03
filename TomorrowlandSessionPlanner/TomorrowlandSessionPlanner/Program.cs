@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using MudBlazor;
 using MudBlazor.Services;
 using TomorrowlandSessionPlanner.Code;
+using TomorrowlandSessionPlanner.DBContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +17,8 @@ builder.Services.AddMudServices(configuration =>
     configuration.SnackbarConfiguration.PreventDuplicates = true;
     configuration.SnackbarConfiguration.VisibleStateDuration = 5000;
 });
+builder.Services.AddDbContextFactory<TmldbContext>(optionsBuilder => 
+    optionsBuilder.UseSqlite("Data Source=data/tmldata.db"));
 builder.Services.AddScoped<PlannerManager>();
 
 // if (!builder.Environment.IsDevelopment())
@@ -28,6 +33,9 @@ builder.Services.AddScoped<PlannerManager>();
 // }
 
 var app = builder.Build();
+
+var dbContext = await app.Services.GetRequiredService<IDbContextFactory<TmldbContext>>().CreateDbContextAsync();
+await dbContext.Database.MigrateAsync();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

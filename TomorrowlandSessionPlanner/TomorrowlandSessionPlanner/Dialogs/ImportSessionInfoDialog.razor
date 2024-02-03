@@ -1,20 +1,17 @@
 ﻿@code {
 
-    [CascadingParameter]
-    MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] public required MudDialogInstance MudDialog { get; set; }
 
-    [Parameter]
-    public List<SessionImportModel> newSessions { get; set; }
+    [Parameter] public List<SessionImportModel> NewSessions { get; set; } = new();
 
-    [Parameter]
-    public List<SessionImportModel> updatedSessions { get; set; }
+    [Parameter] public List<SessionImportModel> UpdatedSessions { get; set; } = new();
 
 }
 
 <MudDialog>
     <DialogContent>
-        <MudText Align="Align.Center" GutterBottom="true" Typo="Typo.h5">Sessions to import</MudText>
-        <MudTable Items="newSessions">
+        <MudText Align="Align.Center" GutterBottom Typo="Typo.h5">Sessions to import</MudText>
+        <MudTable Items="NewSessions" Virtualize>
             <HeaderContent>
                 <MudTh>DJ Name</MudTh>
                 <MudTh>Stage Name</MudTh>
@@ -28,8 +25,8 @@
                 <MudTd DataLabel="End">@context.EndTime</MudTd>
             </RowTemplate>
         </MudTable>
-        <MudText Align="Align.Center" GutterBottom="true" Typo="Typo.h5">Sessions to update</MudText>
-        <MudTable Items="updatedSessions">
+        <MudText Align="Align.Center" GutterBottom Typo="Typo.h5">Sessions to update</MudText>
+        <MudTable Items="UpdatedSessions" Virtualize>
             <HeaderContent>
                 <MudTh>DJ Name</MudTh>
                 <MudTh>Stage Name</MudTh>
@@ -45,7 +42,7 @@
         </MudTable>
     </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="() => MudDialog.Close(DialogResult.Ok(true))">Add them!</MudButton>
-        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="MudDialog.Cancel">Abort!</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(() => MudDialog.Close(DialogResult.Ok(true)))">Add them!</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@MudDialog.Cancel">Abort!</MudButton>
     </DialogActions>
 </MudDialog>
