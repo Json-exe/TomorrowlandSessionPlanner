@@ -14,7 +14,7 @@
     private void AddSessionToUser(Session session)
     {
         PlannerManager.AddedSessions.Add(session);
-        SupplementSessions = PlannerManager._sessionList.Where(s => !PlannerManager.AddedSessions.Any(ss => IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Any(session1 => session1.id != s.id))).ToList();
+        SupplementSessions = PlannerManager.SessionList.Where(s => !PlannerManager.AddedSessions.Any(ss => IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Any(session1 => session1.id != s.id))).ToList();
         StateHasChanged();
     }
 
@@ -47,8 +47,8 @@
                             <MudTh>Action</MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                            <MudTd DataLabel="Stage">@PlannerManager._stageList.First(x => x.id == context.StageId).Name</MudTd>
-                            <MudTd DataLabel="DJ">@PlannerManager._djList.First(x => x.id == context.DJId).Name</MudTd>
+                            <MudTd DataLabel="Stage">@PlannerManager.StageList.First(x => x.id == context.StageId).Name</MudTd>
+                            <MudTd DataLabel="DJ">@PlannerManager.DjList.First(x => x.id == context.DJId).Name</MudTd>
                             <MudTd DataLabel="Start">@context.StartTime</MudTd>
                             <MudTd DataLabel="End">@context.EndTime</MudTd>
                             <MudTd DataLabel="Action">
@@ -72,8 +72,8 @@
                             <MudTh>Action</MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                            <MudTd DataLabel="Stage">@PlannerManager._stageList.First(x => x.id == context.StageId).Name</MudTd>
-                            <MudTd DataLabel="DJ">@PlannerManager._djList.First(x => x.id == context.DJId).Name</MudTd>
+                            <MudTd DataLabel="Stage">@PlannerManager.StageList.First(x => x.id == context.StageId).Name</MudTd>
+                            <MudTd DataLabel="DJ">@PlannerManager.DjList.First(x => x.id == context.DJId).Name</MudTd>
                             <MudTd DataLabel="Start">@context.StartTime</MudTd>
                             <MudTd DataLabel="End">@context.EndTime</MudTd>
                             <MudTd DataLabel="Action">

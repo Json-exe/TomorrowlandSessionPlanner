@@ -4,31 +4,15 @@
 @inject NavigationManager NavigationManager
 @inject PlannerManager PlannerManager
 
-@code {
-
-    private void NavigateToSummary()
-    {
-        if (!PlannerManager.AddedSessions.Any())
-        {
-            Snackbar.Add("Bitte wähle mindestens eine Session aus!", Severity.Info);
-            return;
-        }
-        NavigationManager.NavigateTo("/summary");
-    }
-
-    private static string ToStringFunc(Stage arg)
-    {
-        return arg.Name;
-    }
-
-}
-
 <PageTitle>Create your plan</PageTitle>
 
 <MudStack>
-    <MudText Align="Align.Center" Class="mt-2" GutterBottom="true" Typo="Typo.h2">Bitte wähle deine Sessions für das jeweilige Wochenende aus</MudText>
+    <MudText Align="Align.Center" Class="mt-2" GutterBottom="true" Typo="Typo.h2">
+        Bitte wähle deine Sessions für das jeweilige Wochenende aus
+    </MudText>
     <MudGrid Justify="Justify.Center" Class="mt-3 mb-3">
-        <MudButton Size="Size.Large" OnClick="@NavigateToSummary" Variant="Variant.Filled" Class="mt-3" Color="Color.Info" FullWidth="false" Style="width: 200px;">Next</MudButton>
+        <MudButton Size="Size.Large" OnClick="@NavigateToSummary" Variant="Variant.Filled" Class="mt-3" 
+                   Color="Color.Info" FullWidth="false" Style="width: 200px;">Next</MudButton>
     </MudGrid>
     <MudExpansionPanels Elevation="5" MultiExpansion="true">
         <MudExpansionPanel>
@@ -49,10 +33,11 @@
                             </MudSelect>
                         </MudItem>
                         <MudItem xs="3">
-                            <MudAutocomplete T="string" ResetValueOnEmptyText="true" @bind-Value="@_djFilter" Clearable="true" Variant="Variant.Outlined" Label="Filter DJ" SearchFunc="@DjSearch"/>
+                            <MudAutocomplete T="string" ResetValueOnEmptyText @bind-Value="@_djFilter" Clearable 
+                                             Variant="Variant.Outlined" Label="Filter DJ" SearchFunc="@DjSearch"/>
                         </MudItem>
                         <MudItem xs="3">
-                            <MudButton Variant="Variant.Outlined" OnClick="ApplyFilters" Color="Color.Success">Apply</MudButton>
+                            <MudButton Variant="Variant.Outlined" OnClick="@ApplyFilters" Color="Color.Success">Apply</MudButton>
                         </MudItem>
                     </MudGrid>
                     <MudGrid Spacing="2" Justify="Justify.SpaceEvenly">
@@ -71,24 +56,37 @@
                                 <MudCard Elevation="8" Outlined="true" Class="ml-5 mb-5" Style="min-width: 350px;">
                                     <MudCardContent>
                                         <MudGrid Justify="Justify.Center" Class="mb-3">
-                                            <MudChip Color="Color.Info" Style="justify-self: center;" Size="Size.Large" Icon="@Icons.Material.Filled.LocationCity">
-                                                <MudText Align="Align.Center" Typo="Typo.h4">@_stageList.First(x => x.id == session.StageId).Name</MudText>
+                                            <MudChip Color="Color.Info" Style="justify-self: center;" Size="Size.Large" 
+                                                     Icon="@Icons.Material.Filled.LocationCity">
+                                                <MudText Align="Align.Center" Typo="Typo.h4">
+                                                    @_stageList.First(x => x.id == session.StageId).Name
+                                                </MudText>
                                             </MudChip>
                                         </MudGrid>
                                         <MudCard Outlined="true" Class="pa-3">
-                                            <MudText GutterBottom="true" Typo="Typo.h6" Align="Align.Center">DJ: @_djList.First(x => x.id == session.DJId).Name</MudText>
-                                            <MudText Typo="Typo.h6" Align="Align.Center">Von: @session.StartTime.ToString("dd.MM") (@session.StartTime.ToString("dddd", new CultureInfo("de")))</MudText>
-                                            <MudText Typo="Typo.h6" Align="Align.Center">Bis: @session.EndTime.ToString("dd.MM") (@session.EndTime.ToString("dddd", new CultureInfo("de")))</MudText>
+                                            <MudText GutterBottom="true" Typo="Typo.h6" Align="Align.Center">
+                                                DJ: @_djList.First(x => x.id == session.DJId).Name
+                                            </MudText>
+                                            <MudText Typo="Typo.h6" Align="Align.Center">
+                                                Von: @session.StartTime.ToString("dd.MM") (@session.StartTime.ToString("dddd", new CultureInfo("de")))
+                                            </MudText>
+                                            <MudText Typo="Typo.h6" Align="Align.Center">
+                                                Bis: @session.EndTime.ToString("dd.MM") (@session.EndTime.ToString("dddd", new CultureInfo("de")))
+                                            </MudText>
                                         </MudCard>
                                     </MudCardContent>
                                     <MudCardActions>
-                                        @if (PlannerManager.AddedSessions.Any(x => x.id == session.id))
+                                        @if (PlannerManager.AddedSessions.Select(x => x.id).Contains(session.id))
                                         {
-                                            <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="() => RemoveUserSession(session)" StartIcon="@Icons.Material.Outlined.Remove">Remove!</MudButton>
+                                            <MudButton Variant="Variant.Outlined" Color="Color.Error" 
+                                                       OnClick="@(() => RemoveUserSession(session))" 
+                                                       StartIcon="@Icons.Material.Outlined.Remove">Remove!</MudButton>
                                         }
                                         else
                                         {
-                                            <MudButton Variant="Variant.Outlined" Color="Color.Info" OnClick="() => AddUserSession(session)" StartIcon="@Icons.Material.Outlined.Add">Add!</MudButton>
+                                            <MudButton Variant="Variant.Outlined" Color="Color.Info" 
+                                                       OnClick="@(() => AddUserSession(session))" 
+                                                       StartIcon="@Icons.Material.Outlined.Add">Add!</MudButton>
                                         }
                                     </MudCardActions>
                                 </MudCard>
@@ -115,10 +113,11 @@
                             </MudSelect>
                         </MudItem>
                         <MudItem xs="3">
-                            <MudAutocomplete T="string" ResetValueOnEmptyText="true" @bind-Value="@_djFilter" Clearable="true" Variant="Variant.Outlined" Label="Filter DJ" SearchFunc="@DjSearch"/>
+                            <MudAutocomplete T="string" ResetValueOnEmptyText @bind-Value="@_djFilter" Clearable 
+                                             Variant="Variant.Outlined" Label="Filter DJ" SearchFunc="@DjSearch"/>
                         </MudItem>
                         <MudItem xs="3">
-                            <MudButton Variant="Variant.Outlined" OnClick="ApplyFilters" Color="Color.Success">Apply</MudButton>
+                            <MudButton Variant="Variant.Outlined" OnClick="@ApplyFilters" Color="Color.Success">Apply</MudButton>
                         </MudItem>
                     </MudGrid>
                     <MudGrid Spacing="2" Justify="Justify.SpaceEvenly">
@@ -148,13 +147,17 @@
                                         </MudCard>
                                     </MudCardContent>
                                     <MudCardActions>
-                                        @if (PlannerManager.AddedSessions.Any(x => x.id == session.id))
+                                        @if (PlannerManager.AddedSessions.Select(x => x.id).Contains(session.id))
                                         {
-                                            <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="() => RemoveUserSession(session)" StartIcon="@Icons.Material.Outlined.Remove">Remove!</MudButton>
+                                            <MudButton Variant="Variant.Outlined" Color="Color.Error" 
+                                                       OnClick="@(() => RemoveUserSession(session))" 
+                                                       StartIcon="@Icons.Material.Outlined.Remove">Remove!</MudButton>
                                         }
                                         else
                                         {
-                                            <MudButton Variant="Variant.Outlined" Color="Color.Info" OnClick="() => AddUserSession(session)" StartIcon="@Icons.Material.Outlined.Add">Add!</MudButton>
+                                            <MudButton Variant="Variant.Outlined" Color="Color.Info" 
+                                                       OnClick="@(() => AddUserSession(session))" 
+                                                       StartIcon="@Icons.Material.Outlined.Add">Add!</MudButton>
                                         }
                                     </MudCardActions>
                                 </MudCard>

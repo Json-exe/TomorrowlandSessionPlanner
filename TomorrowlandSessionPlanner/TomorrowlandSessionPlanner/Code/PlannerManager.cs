@@ -6,13 +6,13 @@ namespace TomorrowlandSessionPlanner.Code;
 public class PlannerManager
 {
     public readonly List<Session> AddedSessions = new();
-    public readonly List<Dj> _djList = new();
-    public readonly List<Stage> _stageList = new();
-    public readonly List<Session> _sessionList = new();
+    public readonly List<Dj> DjList = new();
+    public readonly List<Stage> StageList = new();
+    public readonly List<Session> SessionList = new();
 
     public async Task Init()
     {
-        if (_djList.Any() && _stageList.Any() && _sessionList.Any()) return;
+        if (DjList.Any() && StageList.Any() && SessionList.Any()) return;
         
         var currentDirectory = Directory.GetCurrentDirectory();
         var databasePath = Path.Combine(currentDirectory, "Data", "tmldata.db");
@@ -24,7 +24,7 @@ public class PlannerManager
 
         while (await reader.ReadAsync())
         {
-            _djList.Add(new Dj
+            DjList.Add(new Dj
             {
                 id = reader.GetInt32(0),
                 Name = reader.GetString(1)
@@ -38,7 +38,7 @@ public class PlannerManager
 
         while (await reader.ReadAsync())
         {
-            _stageList.Add(new Stage
+            StageList.Add(new Stage
             {
                 id = reader.GetInt32(0),
                 Name = reader.GetString(1)
@@ -53,7 +53,7 @@ public class PlannerManager
 
         while (await reader.ReadAsync())
         {
-            _sessionList.Add(new Session
+            SessionList.Add(new Session
             {
                 id = reader.GetInt32(0),
                 StageId = reader.GetInt32(1),

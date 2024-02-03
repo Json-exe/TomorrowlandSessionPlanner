@@ -1,5 +1,3 @@
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.HttpOverrides;
 using MudBlazor;
 using MudBlazor.Services;
@@ -17,8 +15,6 @@ builder.Services.AddMudServices(configuration =>
     configuration.SnackbarConfiguration.VisibleStateDuration = 5000;
 });
 builder.Services.AddScoped<PlannerManager>();
-
-
 
 // if (!builder.Environment.IsDevelopment())
 // {
@@ -44,11 +40,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-// if (app.Environment.IsDevelopment())
-// {
-//     app.UseHsts();
-//     app.UseHttpsRedirection();
-// }
 app.UseHsts();
 app.UseHttpsRedirection();
 

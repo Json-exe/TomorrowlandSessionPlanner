@@ -1,5 +1,4 @@
 ﻿@page "/summary"
-@using TomorrowlandSessionPlanner.Code
 @using System.Globalization
 @inject PlannerManager PlannerManager
 @inject NavigationManager NavigationManager
@@ -15,11 +14,13 @@
             <MudCardContent>
                 <MudGrid Justify="Justify.Center" Class="mb-3">
                     <MudChip Color="Color.Info" Style="justify-self: center;" Size="Size.Large" Icon="@Icons.Material.Filled.LocationCity">
-                        <MudText Align="Align.Center" Typo="Typo.h4">@PlannerManager._stageList.First(x => x.id == session.StageId).Name</MudText>
+                        <MudText Align="Align.Center" Typo="Typo.h4">@PlannerManager.StageList.First(x => x.id == session.StageId).Name</MudText>
                     </MudChip>
                 </MudGrid>
                 <MudCard Outlined="true">
-                    <MudText GutterBottom="true" Typo="Typo.h6" Align="Align.Center">DJ: @PlannerManager._djList.First(x => x.id == session.DJId).Name</MudText>
+                    <MudText GutterBottom="true" Typo="Typo.h6" Align="Align.Center">
+                        DJ: @PlannerManager.DjList.First(x => x.id == session.DJId).Name
+                    </MudText>
                     <MudText Typo="Typo.h6" Align="Align.Center">Von: @session.StartTime (@session.StartTime.ToString("dddd", new CultureInfo("de")))</MudText>
                     <MudText Typo="Typo.h6" Align="Align.Center">Bis: @session.EndTime (@session.EndTime.ToString("dddd", new CultureInfo("de")))</MudText>
                 </MudCard>
@@ -29,6 +30,8 @@
 </MudGrid>
 
 <MudGrid Justify="Justify.Center" Class="mb-3">
-    <MudButton Size="Size.Large" OnClick="@(() => NavigationManager.NavigateTo("/"))" Variant="Variant.Filled" Class="mt-3" Color="Color.Info" FullWidth="false" Style="width: 200px;">Back</MudButton>
-    <MudButton Size="Size.Large" OnClick="@(() => NavigationManager.NavigateTo("/SessionAnalyzer"))" Variant="Variant.Filled" Class="mt-3 ml-2" Color="Color.Info" FullWidth="false" Style="width: 200px;">Next</MudButton>
+    <MudButton Size="Size.Large" OnClick="@(() => NavigationManager.NavigateTo("/"))" Variant="Variant.Filled" 
+               Class="mt-3" Color="Color.Info" Style="width: 200px;">Back</MudButton>
+    <MudButton Size="Size.Large" OnClick="@(() => NavigationManager.NavigateTo("/SessionAnalyzer"))" 
+               Variant="Variant.Filled" Class="mt-3 ml-2" Color="Color.Info" Style="width: 200px;">Next</MudButton>
 </MudGrid>

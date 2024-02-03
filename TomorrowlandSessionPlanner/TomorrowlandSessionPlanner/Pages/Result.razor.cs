@@ -32,7 +32,7 @@ public partial class Result
 
     private async void ShowSupplements()
     {
-        var allSessions = PlannerManager._sessionList.Where(s => !PlannerManager.AddedSessions.Any(ss => IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Any(session => session.id != s.id))).ToList();
+        var allSessions = PlannerManager.SessionList.Where(s => !PlannerManager.AddedSessions.Any(ss => IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Any(session => session.id != s.id))).ToList();
         var dialogParameters = new DialogParameters
         {
             {"supplementSessions", allSessions}
@@ -93,8 +93,8 @@ public partial class Result
         headerRow.Cells.Add("Ende");
         foreach (var sortedSession in _sortedSessions)
         {
-            var djName = PlannerManager._djList.FirstOrDefault(d => d.id == sortedSession.DJId)?.Name;
-            var stageName = PlannerManager._stageList.FirstOrDefault(s => s.id == sortedSession.StageId)?.Name;
+            var djName = PlannerManager.DjList.FirstOrDefault(d => d.id == sortedSession.DJId)?.Name;
+            var stageName = PlannerManager.StageList.FirstOrDefault(s => s.id == sortedSession.StageId)?.Name;
             var row = table.Rows.Add();
             row.Cells.Add(stageName);
             row.Cells.Add(djName);

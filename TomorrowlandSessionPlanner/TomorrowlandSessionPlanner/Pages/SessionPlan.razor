@@ -17,17 +17,19 @@ else
 {
     <MudText Align="Align.Center" Typo="Typo.h3" GutterBottom="true">Ein paar deiner Ausgewählten Sessions finden gleichzeitig statt!</MudText>
     <MudGrid Spacing="2" Justify="Justify.Center">
-        @foreach (var sessionClass in _overlappingSessionClasses)
+        @foreach (var sessionClass in _overlappingSessions)
         {
             <MudCard Elevation="8" Outlined="true" Class="ml-5 mb-5" Style="width: 400px;">
                 <MudCardContent>
                     <MudGrid Justify="Justify.Center" Class="mb-3">
                         <MudChip Color="Color.Info" Style="justify-self: center;" Size="Size.Large" Icon="@Icons.Material.Filled.LocationCity">
-                            <MudText Align="Align.Center" Typo="Typo.h4">@PlannerManager._stageList.First(x => x.id == sessionClass.Session.StageId).Name</MudText>
+                            <MudText Align="Align.Center" Typo="Typo.h4">
+                                @PlannerManager.StageList.First(x => x.id == sessionClass.Session.StageId).Name
+                            </MudText>
                         </MudChip>
                     </MudGrid>
                     <MudCard Outlined="true">
-                        <MudText GutterBottom="true" Typo="Typo.h6" Align="Align.Center">DJ: @PlannerManager._djList.First(x => x.id == sessionClass.Session.DJId).Name</MudText>
+                        <MudText GutterBottom="true" Typo="Typo.h6" Align="Align.Center">DJ: @PlannerManager.DjList.First(x => x.id == sessionClass.Session.DJId).Name</MudText>
                         <MudText Typo="Typo.h6" Align="Align.Center">Von: @sessionClass.Session.StartTime (@sessionClass.Session.StartTime.ToString("dddd", new CultureInfo("de")))</MudText>
                         <MudText Typo="Typo.h6" Align="Align.Center">Bis: @sessionClass.Session.EndTime (@sessionClass.Session.EndTime.ToString("dddd", new CultureInfo("de")))</MudText>
                     </MudCard>
@@ -37,9 +39,11 @@ else
                             @foreach (var session in sessionClass.OverlappingSessions)
                             {
                                 <MudListItem Dense="true">
-                                    <MudText Inline="true">@PlannerManager._stageList.First(x => x.id == session.StageId).Name | </MudText>
-                                    <MudText Inline="true">DJ: @PlannerManager._djList.First(x => x.id == session.DJId).Name</MudText>
-                                    <MudIconButton Icon="@Icons.Material.Filled.Remove" Class="ml-2" Size="Size.Small" Title="Remove" Color="Color.Error" Variant="Variant.Outlined" OnClick="() => RemoveUserSession(session)"/>
+                                    <MudText Inline="true">@PlannerManager.StageList.First(x => x.id == session.StageId).Name | </MudText>
+                                    <MudText Inline="true">DJ: @PlannerManager.DjList.First(x => x.id == session.DJId).Name</MudText>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Remove" Class="ml-2" Size="Size.Small" 
+                                                   Title="Remove" Color="Color.Error" Variant="Variant.Outlined" 
+                                                   OnClick="@(() => RemoveUserSession(session))"/>
                                     <MudDivider Class="mt-2" DividerType="DividerType.Middle"/>
                                 </MudListItem>
                             }
@@ -47,14 +51,18 @@ else
                     </MudCard>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="() => RemoveUserSession(sessionClass.Session)" StartIcon="@Icons.Material.Outlined.Remove">Remove!</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Error" 
+                               OnClick="@(() => RemoveUserSession(sessionClass.Session))" 
+                               StartIcon="@Icons.Material.Outlined.Remove">Remove!</MudButton>
                 </MudCardActions>
             </MudCard>
         }
     </MudGrid>
 
     <MudGrid Justify="Justify.Center" Class="mb-3 mt-3" Spacing="2">
-        <MudButton Size="Size.Large" OnClick="@(() => NavigationManager.NavigateTo("/"))" Variant="Variant.Filled" Color="Color.Info" FullWidth="false" Style="width: 200px;">Zurück</MudButton>
-        <MudButton Size="Size.Large" Class="ml-2" OnClick="@(() => NavigationManager.NavigateTo("/Result"))" Variant="Variant.Filled" Color="Color.Info" FullWidth="false" Style="width: 200px;">Ignorieren</MudButton>
+        <MudButton Size="Size.Large" OnClick="@(() => NavigationManager.NavigateTo("/"))" 
+                   Variant="Variant.Filled" Color="Color.Info" Style="width: 200px;">Zurück</MudButton>
+        <MudButton Size="Size.Large" Class="ml-2" OnClick="@(() => NavigationManager.NavigateTo("/Result"))" 
+                   Variant="Variant.Filled" Color="Color.Info" Style="width: 200px;">Ignorieren</MudButton>
     </MudGrid>
 }

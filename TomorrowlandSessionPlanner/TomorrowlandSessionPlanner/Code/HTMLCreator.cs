@@ -20,8 +20,8 @@ public class HTMLCreator
         html.Append("<tbody>");
         foreach (var session in sessions)
         {
-            var stage = plannerManager._stageList.First(s => s.id == session.StageId);
-            var dj = plannerManager._djList.First(d => d.id == session.DJId);
+            var stage = plannerManager.StageList.First(s => s.id == session.StageId);
+            var dj = plannerManager.DjList.First(d => d.id == session.DJId);
             html.Append("<tr>");
             html.Append($"<td>{stage.Name}</td>");
             html.Append($"<td>{dj.Name}</td>");
