@@ -88,56 +88,6 @@ public partial class Result : ComponentBase, IAsyncDisposable
         File.Delete(savePath);
     }
 
-    private async void DownloadPdfFile()
-    {
-        var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data",
-            $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.pdf");
-        var document = new Document();
-        var page = document.Pages.Add();
-        var table = new Table
-        {
-            ColumnWidths = "100"
-        };
-
-        var headerRow = table.Rows.Add();
-        headerRow.Cells.Add("Bühne");
-        headerRow.Cells.Add("DJ");
-        headerRow.Cells.Add("Start");
-        headerRow.Cells.Add("Ende");
-        foreach (var sortedSession in _sortedSessions)
-        {
-            var djName = PlannerManager.DjList.FirstOrDefault(d => d.id == sortedSession.DJId)?.Name;
-            var stageName = PlannerManager.StageList.FirstOrDefault(s => s.id == sortedSession.StageId)?.Name;
-            var row = table.Rows.Add();
-            row.Cells.Add(stageName);
-            row.Cells.Add(djName);
-            row.Cells.Add(sortedSession.StartTime.ToString("dd-MM-yyyy HH:mm"));
-            row.Cells.Add(sortedSession.EndTime.ToString("dd-MM-yyyy HH:mm"));
-        }
-
-        // Create a title text for the PDF
-        var title = new TextFragment("Tomorrowland Session Planner")
-        {
-            TextState =
-            {
-                FontSize = 20,
-                FontStyle = FontStyles.Bold,
-                ForegroundColor = Color.FromRgb(System.Drawing.Color.Black)
-            },
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
-
-        page.Paragraphs.Add(title);
-        page.Paragraphs.Add(table);
-
-        document.Save(savePath);
-        var bites = await File.ReadAllBytesAsync(savePath);
-        var fileName = Path.GetFileName(savePath);
-        if (_jsModule != null) 
-            await _jsModule.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
-        File.Delete(savePath);
-    }
-
     public async ValueTask DisposeAsync()
     {
         if (_jsModule != null) await _jsModule.DisposeAsync();
