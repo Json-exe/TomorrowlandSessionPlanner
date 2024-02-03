@@ -20,16 +20,16 @@ builder.Services.AddScoped<PlannerManager>();
 
 
 
-if (!builder.Environment.IsDevelopment())
-{
-    builder.WebHost.ConfigureKestrel(options =>
-    {
-        options.Listen(IPAddress.Loopback, 5002, listenOptions =>
-        {
-            listenOptions.UseHttps(new X509Certificate2("/home/jason/certs/tmlPlanner/certificate.pfx", Environment.GetCommandLineArgs()[0]));
-        });
-    });
-}
+// if (!builder.Environment.IsDevelopment())
+// {
+//     builder.WebHost.ConfigureKestrel(options =>
+//     {
+//         options.Listen(IPAddress.Loopback, 5002, listenOptions =>
+//         {
+//             listenOptions.UseHttps(new X509Certificate2("/home/jason/certs/tmlPlanner/certificate.pfx", Environment.GetCommandLineArgs()[0]));
+//         });
+//     });
+// }
 
 var app = builder.Build();
 

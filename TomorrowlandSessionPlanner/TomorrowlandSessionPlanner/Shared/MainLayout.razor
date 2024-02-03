@@ -36,14 +36,6 @@
     {
         _drawerOpen = !_drawerOpen;
     }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            NavigationManager.NavigateTo("/");
-        }
-    }
 }
 
 <style>
