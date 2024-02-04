@@ -4,6 +4,8 @@ using MudBlazor;
 using MudBlazor.Services;
 using TomorrowlandSessionPlanner.Core.Code;
 using TomorrowlandSessionPlanner.Core.DBContext;
+using TomorrowlandSessionPlanner.Core.Services;
+using TomorrowlandSessionPlanner.Hub;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,8 @@ builder.Services.AddMudServices(configuration =>
 builder.Services.AddDbContextFactory<TmldbContext>(optionsBuilder => 
     optionsBuilder.UseSqlite("Data Source=data/tmldata.db"));
 builder.Services.AddScoped<PlannerManager>();
+builder.Services.AddScoped<LobbyService>();
+builder.Services.AddSingleton<LobbyHub>();
 
 // if (!builder.Environment.IsDevelopment())
 // {
@@ -55,6 +59,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.MapBlazorHub();
+app.MapHub<LobbyHub>("/hubs/lobby");
 app.MapFallbackToPage("/_Host");
 
 app.Run();

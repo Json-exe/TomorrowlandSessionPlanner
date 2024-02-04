@@ -1,0 +1,32 @@
+﻿@page "/LobbyMenu"
+@using TomorrowlandSessionPlanner.Core.Services
+@using TomorrowlandSessionPlanner.Core.Code
+@inject PlannerManager PlannerManager
+@inject LobbyService LobbyService
+
+@code {
+    private Task CreateLobby(MouseEventArgs obj)
+    {
+        return LobbyService.CreateLobby();
+    }
+
+    private Task JoinLobby()
+    {
+        return LobbyService.JoinLobby(LobbyId);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await PlannerManager.Init();
+    }
+
+    private string LobbyId { get; set; } = string.Empty;
+}
+
+<MudStack>
+    <MudTextField T="string" @bind-Value="@LobbyId" Placeholder="Lobby ID"/>
+    <MudStack Row>
+        <MudButton Color="Color.Primary" OnClick="@JoinLobby">Join Lobby</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@CreateLobby">Create Lobby</MudButton>
+    </MudStack>
+</MudStack>
