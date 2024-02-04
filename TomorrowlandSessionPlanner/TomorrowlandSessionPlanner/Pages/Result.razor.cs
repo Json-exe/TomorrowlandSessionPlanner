@@ -11,10 +11,10 @@ namespace TomorrowlandSessionPlanner.Pages;
 public partial class Result : ComponentBase, IAsyncDisposable
 {
     private bool _loading = true;
-    private List<Session> _sortedSessions = new();
+    private List<Session> _sortedSessions = [];
     private IJSObjectReference? _jsModule;
-    private readonly DateTime _weekend2Start = new(2023, 7, 28, 00, 0, 0);
-    private readonly DateTime _weekend1Start = new(2023, 7, 21, 00, 0, 0);
+    private readonly DateTime _weekend2Start = new(2023, 7, 28);
+    private readonly DateTime _weekend1Start = new(2023, 7, 21);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

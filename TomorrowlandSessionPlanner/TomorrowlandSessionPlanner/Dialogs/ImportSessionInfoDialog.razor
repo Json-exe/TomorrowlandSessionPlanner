@@ -1,15 +1,4 @@
-﻿@using TomorrowlandSessionPlanner.Core.Model
-@code {
-
-    [CascadingParameter] public required MudDialogInstance MudDialog { get; set; }
-
-    [Parameter] public List<SessionImportModel> NewSessions { get; set; } = new();
-
-    [Parameter] public List<SessionImportModel> UpdatedSessions { get; set; } = new();
-
-}
-
-<MudDialog>
+﻿<MudDialog>
     <DialogContent>
         <MudText Align="Align.Center" GutterBottom Typo="Typo.h5">Sessions to import</MudText>
         <MudTable Items="NewSessions" Virtualize>
@@ -43,7 +32,9 @@
         </MudTable>
     </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(() => MudDialog.Close(DialogResult.Ok(true)))">Add them!</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(() => MudDialog.Close(DialogResult.Ok(true)))">
+            Add them!
+        </MudButton>
         <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@MudDialog.Cancel">Abort!</MudButton>
     </DialogActions>
 </MudDialog>

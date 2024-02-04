@@ -10,9 +10,9 @@ public class Grabber
 {
     private const string BaseUrl = "https://www.tomorrowland.com/en/festival/line-up/stages/";
     private ReadOnlyCollection<IWebElement>? _eventDayButtons;
-    private IWebDriver _driver = null!;
-    private int _selectedDay = 0;
-    private List<Session> _sessions = new();
+    private FirefoxDriver _driver = null!;
+    private int _selectedDay;
+    private readonly List<Session> _sessions = [];
 
     public void Start(GrabberOptions grabberOptions)
     {
@@ -153,22 +153,15 @@ public class Grabber
                     if (!djNameParts[0].Contains("KAS:ST") && !djNameParts[0].Contains("Myu:sa"))
                     {
                         var djNameParts2 = djNameParts[0].Split(":");
-                        if (djNameParts2.Length > 1)
-                        {
-                            djName = djNameParts2[1];
-                        } 
-                        else
-                        {
-                            djName = djNameParts2[0];
-                        }
+                        djName = djNameParts2.Length > 1 ? djNameParts2[1] : djNameParts2[0];
                     }
                     else
                     {
                         djName = djNameParts[0];
                     }
-                    session.DJName = djName.Trim();
+                    session.DjName = djName.Trim();
                     Console.WriteLine(
-                        $"Stage: {session.StageName}, DJ: {session.DJName}, Start: {session.StartTime}, End: {session.EndTime}");
+                        $"Stage: {session.StageName}, DJ: {session.DjName}, Start: {session.StartTime}, End: {session.EndTime}");
                     _sessions.Add(session);
                 }
                 catch (Exception e)

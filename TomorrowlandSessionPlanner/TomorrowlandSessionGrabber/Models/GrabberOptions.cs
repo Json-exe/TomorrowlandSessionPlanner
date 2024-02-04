@@ -2,8 +2,8 @@
 
 public class GrabberOptions
 {
-    public bool Headless { get; set; }
-    public Weekend Weekend { get; set; } = Weekend.Weekend1;
+    public bool Headless { get; init; }
+    public Weekend Weekend { get; init; } = Weekend.Weekend1;
 }
 
 public enum Weekend

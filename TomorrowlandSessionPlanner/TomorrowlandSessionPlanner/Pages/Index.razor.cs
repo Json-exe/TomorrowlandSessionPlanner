@@ -6,10 +6,10 @@ namespace TomorrowlandSessionPlanner.Pages;
 
 public partial class Index : ComponentBase
 {
-    private readonly List<Dj> _djList = new();
-    private readonly List<Stage> _stageList = new();
-    private readonly List<Session> _sessionList = new();
-    private List<Session> _filteredSessions = new();
+    private readonly List<Dj> _djList = [];
+    private readonly List<Stage> _stageList = [];
+    private readonly List<Session> _sessionList = [];
+    private List<Session> _filteredSessions = [];
     private readonly DateTime _weekend2Start = new(2023, 7, 28);
     private readonly DateTime _weekend1Start = new(2023, 7, 21);
     private IEnumerable<Stage> _stageFilter = new List<Stage>();

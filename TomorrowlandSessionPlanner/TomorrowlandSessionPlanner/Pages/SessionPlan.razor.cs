@@ -7,7 +7,7 @@ namespace TomorrowlandSessionPlanner.Pages;
 public partial class SessionPlan : ComponentBase
 {
     private bool _loading = true;
-    private readonly List<OverlappingSession> _overlappingSessions = new();
+    private readonly List<OverlappingSession> _overlappingSessions = [];
 
     private async Task CheckSessions()
     {
@@ -22,7 +22,7 @@ public partial class SessionPlan : ComponentBase
             var overlapSession = new OverlappingSession
             {
                 Session = addedSession,
-                OverlappingSessions = new List<Session>()
+                OverlappingSessions = []
             };
 
             foreach (var otherSession in PlannerManager.AddedSessions.Where(x => x != addedSession))

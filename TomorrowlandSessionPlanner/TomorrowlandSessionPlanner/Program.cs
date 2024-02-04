@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using MudBlazor;
 using MudBlazor.Services;
 using TomorrowlandSessionPlanner.Core.Code;
