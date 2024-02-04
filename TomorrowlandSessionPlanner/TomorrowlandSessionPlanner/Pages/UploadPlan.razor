@@ -1,5 +1,5 @@
 ﻿@page "/upload"
-@using TomorrowlandSessionPlanner.Code
+@using TomorrowlandSessionPlanner.Core.Code
 @inject PlannerManager PlannerManager
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
@@ -7,7 +7,7 @@
 <MudStack Justify="Justify.Center" Style="display: flex; align-items: center; height: 100%">
     <MudText Align="Align.Center" GutterBottom="true" Typo="Typo.h3">Bitte Lade hier deine Plan Datei hoch!</MudText>
     <MudPaper Outlined="true" Class="pa-8">
-        <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Accept=".tmlplanner" MaximumFileCount="1" Required="true">
+        <MudFileUpload T="IBrowserFile" FilesChanged="@UploadFiles" Accept=".tmlplanner" MaximumFileCount="1" Required>
             <ButtonTemplate>
                 <MudButton HtmlTag="label"
                            Variant="Variant.Filled"
@@ -18,7 +18,8 @@
                 </MudButton>
             </ButtonTemplate>
             <SelectedTemplate>
-                @if (context != null)
+                @* ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract *@
+                @if (context is not null)
                 {
                     <MudText>@context.Name</MudText>
                 }
@@ -29,7 +30,9 @@
             </SelectedTemplate>
         </MudFileUpload>
     </MudPaper>
-    <MudText Align="Align.Center" Typo="Typo.h6">Deine Dateien werden nicht auf unseren Servern gespeichert! Sie werden lediglich ausgelesen und verarbeitet. Kein Byte deiner Datei landet auf unserer Fesplatte.</MudText>
+    <MudText Align="Align.Center" Typo="Typo.h6">
+        Deine Dateien werden nicht auf unseren Servern gespeichert! Sie werden lediglich ausgelesen und verarbeitet. Kein Byte deiner Datei landet auf unserer Fesplatte.
+    </MudText>
 </MudStack>
 
 <style>

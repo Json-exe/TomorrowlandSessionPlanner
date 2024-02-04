@@ -1,8 +1,4 @@
-﻿export function getHtmlCode() {
-    return document.querySelector('html').outerHTML;
-}
-
-export function saveAsFile(filename, data) {
+﻿export function saveAsFile(filename, data) {
     let link = document.createElement('a');
     link.download = filename;
     link.href = 'data:application/octet-stream;base64,' + data;

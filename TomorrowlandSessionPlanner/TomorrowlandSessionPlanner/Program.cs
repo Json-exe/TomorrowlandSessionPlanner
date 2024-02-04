@@ -1,9 +1,9 @@
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
-using TomorrowlandSessionPlanner.Code;
+using TomorrowlandSessionPlanner.Core.Code;
+using TomorrowlandSessionPlanner.Core.DBContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,22 +16,25 @@ builder.Services.AddMudServices(configuration =>
     configuration.SnackbarConfiguration.PreventDuplicates = true;
     configuration.SnackbarConfiguration.VisibleStateDuration = 5000;
 });
+builder.Services.AddDbContextFactory<TmldbContext>(optionsBuilder => 
+    optionsBuilder.UseSqlite("Data Source=data/tmldata.db"));
 builder.Services.AddScoped<PlannerManager>();
 
-
-
-if (!builder.Environment.IsDevelopment())
-{
-    builder.WebHost.ConfigureKestrel(options =>
-    {
-        options.Listen(IPAddress.Loopback, 5002, listenOptions =>
-        {
-            listenOptions.UseHttps(new X509Certificate2("/home/jason/certs/tmlPlanner/certificate.pfx", Environment.GetCommandLineArgs()[0]));
-        });
-    });
-}
+// if (!builder.Environment.IsDevelopment())
+// {
+//     builder.WebHost.ConfigureKestrel(options =>
+//     {
+//         options.Listen(IPAddress.Loopback, 5002, listenOptions =>
+//         {
+//             listenOptions.UseHttps(new X509Certificate2("/home/jason/certs/tmlPlanner/certificate.pfx", Environment.GetCommandLineArgs()[0]));
+//         });
+//     });
+// }
 
 var app = builder.Build();
+
+var dbContext = await app.Services.GetRequiredService<IDbContextFactory<TmldbContext>>().CreateDbContextAsync();
+await dbContext.Database.MigrateAsync();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -44,11 +47,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-// if (app.Environment.IsDevelopment())
-// {
-//     app.UseHsts();
-//     app.UseHttpsRedirection();
-// }
 app.UseHsts();
 app.UseHttpsRedirection();
 

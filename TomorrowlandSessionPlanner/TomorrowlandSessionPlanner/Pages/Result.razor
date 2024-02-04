@@ -1,5 +1,5 @@
 ﻿@page "/Result"
-@using System.Globalization
+@using TomorrowlandSessionPlanner.Core.Code
 @inject PlannerManager PlannerManager
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
@@ -18,26 +18,14 @@ else
 {
     @if (_sortedSessions.Any(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
     {
-        <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">Dein Plan Weekend 1</MudText>
+        <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom>Dein Plan Weekend 1</MudText>
         <MudGrid Justify="Justify.Center">
             <MudTimeline>
-                @foreach (var sortedSession in _sortedSessions.Where(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
+                @foreach (var session in _sortedSessions.Where(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
                 {
-                    <MudTimelineItem Size="Size.Medium" Variant="Variant.Outlined" Color="Color.Info" TimelineAlign="TimelineAlign.Default" Style="width: 1000px;">
-                        <MudCard Elevation="8">
-                            <MudCardContent>
-                                <MudGrid Justify="Justify.Center" Class="mb-3">
-                                    <MudChip Color="Color.Info" Style="justify-self: center;" Size="Size.Large" Icon="@Icons.Material.Filled.LocationCity">
-                                        <MudText Align="Align.Center" Typo="Typo.h4">@PlannerManager._stageList.First(x => x.id == sortedSession.StageId).Name</MudText>
-                                    </MudChip>
-                                </MudGrid>
-                                <MudCard Outlined="true">
-                                    <MudText GutterBottom="true" Typo="Typo.h6" Align="Align.Center">DJ: @PlannerManager._djList.First(x => x.id == sortedSession.DJId).Name</MudText>
-                                    <MudText Typo="Typo.h6" Align="Align.Center">Von: @sortedSession.StartTime (@sortedSession.StartTime.ToString("dddd", new CultureInfo("de")))</MudText>
-                                    <MudText Typo="Typo.h6" Align="Align.Center">Bis: @sortedSession.EndTime (@sortedSession.EndTime.ToString("dddd", new CultureInfo("de")))</MudText>
-                                </MudCard>
-                            </MudCardContent>
-                        </MudCard>
+                    <MudTimelineItem Size="Size.Medium" Variant="Variant.Outlined" Color="Color.Info" 
+                                     TimelineAlign="TimelineAlign.Default" Style="width: 1000px;" @key="session.Id">
+                        <SessionCard Session="session" IsReadonly/>
                     </MudTimelineItem>
                 }
             </MudTimeline>
@@ -46,26 +34,14 @@ else
     
     @if (_sortedSessions.Any(x => x.StartTime >= _weekend2Start))
     {
-        <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true" Class="mt-3">Dein Plan Weekend 2</MudText>
+        <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom Class="mt-3">Dein Plan Weekend 2</MudText>
         <MudGrid Justify="Justify.Center">
             <MudTimeline>
-                @foreach (var sortedSession in _sortedSessions.Where(x => x.StartTime >= _weekend2Start))
+                @foreach (var session in _sortedSessions.Where(x => x.StartTime >= _weekend2Start))
                 {
-                    <MudTimelineItem Size="Size.Medium" Variant="Variant.Outlined" Color="Color.Info" TimelineAlign="TimelineAlign.Default" Style="width: 1000px;">
-                        <MudCard Elevation="8">
-                            <MudCardContent>
-                                <MudGrid Justify="Justify.Center" Class="mb-3">
-                                    <MudChip Color="Color.Info" Style="justify-self: center;" Size="Size.Large" Icon="@Icons.Material.Filled.LocationCity">
-                                        <MudText Align="Align.Center" Typo="Typo.h4">@PlannerManager._stageList.First(x => x.id == sortedSession.StageId).Name</MudText>
-                                    </MudChip>
-                                </MudGrid>
-                                <MudCard Outlined="true">
-                                    <MudText GutterBottom="true" Typo="Typo.h6" Align="Align.Center">DJ: @PlannerManager._djList.First(x => x.id == sortedSession.DJId).Name</MudText>
-                                    <MudText Typo="Typo.h6" Align="Align.Center">Von: @sortedSession.StartTime (@sortedSession.StartTime.ToString("dddd", new CultureInfo("de")))</MudText>
-                                    <MudText Typo="Typo.h6" Align="Align.Center">Bis: @sortedSession.EndTime (@sortedSession.EndTime.ToString("dddd", new CultureInfo("de")))</MudText>
-                                </MudCard>
-                            </MudCardContent>
-                        </MudCard>
+                    <MudTimelineItem Size="Size.Medium" Variant="Variant.Outlined" Color="Color.Info" 
+                                     TimelineAlign="TimelineAlign.Default" Style="width: 1000px;" @key="session.Id">
+                        <SessionCard Session="session" IsReadonly/>
                     </MudTimelineItem>
                 }
             </MudTimeline>
@@ -73,12 +49,16 @@ else
     }
 
     <MudDivider Class="mt-5" DividerType="DividerType.FullWidth"/>
-    <MudText Align="Align.Center" Typo="Typo.h5" GutterBottom="true">Du kannst nun auswählen ob du eine HTML oder eine Daten Datei herunterladen möchtest. Die HTML Datei enthält eine Tabelle mit dem Plan, die Daten Datei
+    <MudText Align="Align.Center" Typo="Typo.h5" GutterBottom>Du kannst nun auswählen ob du eine HTML oder eine Daten-Datei herunterladen möchtest. Die HTML Datei enthält eine Tabelle mit dem Plan, die Daten-Datei
          kannst du jederzeit hier wieder Importieren, einsehen und anpassen.</MudText>
     <MudGrid Justify="Justify.Center" Class="mb-3 mt-3" Spacing="2">
-        <MudButton Size="Size.Large" Variant="Variant.Filled" Color="Color.Info" FullWidth="false" OnClick="ShowSupplements" Style="width: 200px;">Ergänzungen zeigen</MudButton>
-        <MudButton Size="Size.Large" Class="ml-2" OnClick="DownloadFile" Variant="Variant.Filled" Color="Color.Info" FullWidth="false" Style="width: 200px;">Download Daten</MudButton>
-        <MudButton Size="Size.Large" Class="ml-2" OnClick="DownloadHtmlFile" Variant="Variant.Filled" Color="Color.Info" FullWidth="false" Style="width: 200px;">Download HTML</MudButton>
-        <MudButton Size="Size.Large" Class="ml-2" OnClick="@(() => NavigationManager.NavigateTo("/"))" Variant="Variant.Filled" Color="Color.Info" FullWidth="false" Style="width: 200px;">Plan anpassen</MudButton>
+        <MudButton Size="Size.Large" Variant="Variant.Filled" Color="Color.Info" FullWidth
+                   OnClick="@ShowSupplements" Style="width: 200px;">Ergänzungen zeigen</MudButton>
+        <MudButton Size="Size.Large" Class="ml-2" OnClick="@DownloadFile" Variant="Variant.Filled" Color="Color.Info" 
+                   FullWidth Style="width: 200px;">Download Daten</MudButton>
+        <MudButton Size="Size.Large" Class="ml-2" OnClick="@DownloadHtmlFile" Variant="Variant.Filled" 
+                   Color="Color.Info" FullWidth Style="width: 200px;">Download HTML</MudButton>
+        <MudButton Size="Size.Large" Class="ml-2" OnClick="@(() => NavigationManager.NavigateTo("/"))" 
+                   Variant="Variant.Filled" Color="Color.Info" FullWidth Style="width: 200px;">Plan anpassen</MudButton>
     </MudGrid>
 }

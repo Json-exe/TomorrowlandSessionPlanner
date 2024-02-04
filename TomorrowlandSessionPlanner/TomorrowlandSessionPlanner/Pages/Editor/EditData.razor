@@ -2,7 +2,6 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
-@inject PlannerManager PlannerManager
 
 @if (_loading)
 {
@@ -31,20 +30,23 @@ else
         </MudItem>
         <MudItem xs="12" sm="6">
             <MudPaper Elevation="2" Class="pa-4">
-                <MudTable Items="_djList" Height="300px">
+                <MudTable Items="_djList" Height="300px" Virtualize>
                     <HeaderContent>
                         <MudTh>DJ ID</MudTh>
                         <MudTh>DJ Name</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="DJ ID">@context.id</MudTd>
+                        <MudTd DataLabel="DJ ID">@context.Id</MudTd>
                         <MudTd DataLabel="DJ Name">@context.Name</MudTd>
                     </RowTemplate>
                 </MudTable>
                 <MudGrid Spacing="2" Class="mt-3">
-                    <MudTextField T="string" Variant="Variant.Outlined" bind-Value="@_newDj" Label="Enter name of DJ to add"/>
-                    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="AddNewDj" StartIcon="@Icons.Material.Filled.Add">Add DJ</MudButton>
-                    <MudFileUpload T="IBrowserFile" FilesChanged="ImportDj" Accept=".json" MaximumFileCount="1">
+                    <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@_newDj" Label="Enter name of DJ to add"/>
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@AddNewDj"
+                               StartIcon="@Icons.Material.Filled.Add">
+                        Add DJ
+                    </MudButton>
+                    <MudFileUpload T="IBrowserFile" FilesChanged="@ImportDj" Accept=".json" MaximumFileCount="1">
                         <ButtonTemplate>
                             <MudButton HtmlTag="label"
                                        Variant="Variant.Filled"
@@ -55,7 +57,8 @@ else
                             </MudButton>
                         </ButtonTemplate>
                         <SelectedTemplate>
-                            @if (context != null)
+                            @* ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract *@
+                            @if (context is not null)
                             {
                                 <MudText>@context.Name</MudText>
                             }
@@ -76,15 +79,39 @@ else
                         <MudTh>Stage Name</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Stage ID">@context.id</MudTd>
+                        <MudTd DataLabel="Stage ID">@context.Id</MudTd>
                         <MudTd DataLabel="Stage Name">@context.Name</MudTd>
                     </RowTemplate>
                 </MudTable>
+                <MudGrid Class="mt-3" Spacing="2">
+                    <MudFileUpload T="IBrowserFile" FilesChanged="@ImportStages" Accept=".json" MaximumFileCount="1">
+                        <ButtonTemplate>
+                            <MudButton HtmlTag="label"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Success"
+                                       StartIcon="@Icons.Material.Filled.ImportExport"
+                                       for="@context">
+                                Upload from file
+                            </MudButton>
+                        </ButtonTemplate>
+                        <SelectedTemplate>
+                            @* ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract *@
+                            @if (context is not null)
+                            {
+                                <MudText>@context.Name</MudText>
+                            }
+                            else
+                            {
+                                <MudText>Nothing selected</MudText>
+                            }
+                        </SelectedTemplate>
+                    </MudFileUpload>
+                </MudGrid>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">
             <MudPaper Elevation="2" Class="pa-4">
-                <MudTable Items="_sessionList" Height="300px">
+                <MudTable Items="_sessionList" Height="300px" Virtualize>
                     <HeaderContent>
                         <MudTh>Session ID</MudTh>
                         <MudTh>Stage ID</MudTh>
@@ -93,16 +120,19 @@ else
                         <MudTh>End Time</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Session ID">@context.id</MudTd>
+                        <MudTd DataLabel="Session ID">@context.Id</MudTd>
                         <MudTd DataLabel="Stage ID">@context.StageId</MudTd>
-                        <MudTd DataLabel="DJ ID">@context.DJId</MudTd>
+                        <MudTd DataLabel="DJ ID">@context.DjId</MudTd>
                         <MudTd DataLabel="Start Time">@context.StartTime</MudTd>
                         <MudTd DataLabel="End Time">@context.EndTime</MudTd>
                     </RowTemplate>
                 </MudTable>
                 <MudGrid Class="mt-3" Spacing="2">
-                    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="AddSession" StartIcon="@Icons.Material.Filled.Add">Add Session</MudButton>
-                    <MudFileUpload T="IBrowserFile" FilesChanged="ImportSessions" Accept=".json" MaximumFileCount="1">
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@AddSession"
+                               StartIcon="@Icons.Material.Filled.Add">
+                        Add Session
+                    </MudButton>
+                    <MudFileUpload T="IBrowserFile" FilesChanged="@ImportSessions" Accept=".json" MaximumFileCount="1">
                         <ButtonTemplate>
                             <MudButton HtmlTag="label"
                                        Variant="Variant.Filled"
@@ -113,7 +143,8 @@ else
                             </MudButton>
                         </ButtonTemplate>
                         <SelectedTemplate>
-                            @if (context != null)
+                            @* ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract *@
+                            @if (context is not null) 
                             {
                                 <MudText>@context.Name</MudText>
                             }
@@ -123,13 +154,15 @@ else
                             }
                         </SelectedTemplate>
                     </MudFileUpload>
-                    <MudSelect class="ml-2" @bind-Value="@_selectedStage" FullWidth="false" Variant="Variant.Outlined" Label="Pre-select Stage" Clearable="true">
+                    <MudSelect class="ml-2" @bind-Value="@_selectedStage" FullWidth Variant="Variant.Outlined"
+                               Label="Pre-select Stage" Clearable>
                         @foreach (var item in _stageList)
                         {
-                            <MudSelectItem Value="@item.id">@item.Name</MudSelectItem>
+                            <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
                         }
                     </MudSelect>
-                    <MudDatePicker @bind-Date="@_startDate" Editable="true" Variant="Variant.Outlined" Clearable="true" Label="Pre-select a date"/>
+                    <MudDatePicker @bind-Date="@_startDate" Editable Variant="Variant.Outlined" Clearable
+                                   Label="Pre-select a date"/>
                 </MudGrid>
             </MudPaper>
         </MudItem>

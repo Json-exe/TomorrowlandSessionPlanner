@@ -1,16 +1,17 @@
-﻿using Microsoft.Data.Sqlite;
-using TomorrowlandSessionPlanner.Models;
+﻿using Microsoft.AspNetCore.Components;
+using MudBlazor;
+using TomorrowlandSessionPlanner.Core.Model;
 
 namespace TomorrowlandSessionPlanner.Pages;
 
-public partial class Index
+public partial class Index : ComponentBase
 {
-    private readonly List<Dj> _djList = new();
-    private readonly List<Stage> _stageList = new();
-    private readonly List<Session> _sessionList = new();
-    private List<Session> _filteredSessions = new();
-    private readonly DateTime _weekend2Start = new(2023, 7, 28, 00, 0, 0);
-    private readonly DateTime _weekend1Start = new(2023, 7, 21, 00, 0, 0);
+    private readonly List<Dj> _djList = [];
+    private readonly List<Stage> _stageList = [];
+    private readonly List<Session> _sessionList = [];
+    private List<Session> _filteredSessions = [];
+    private readonly DateTime _weekend2Start = new(2023, 7, 28);
+    private readonly DateTime _weekend1Start = new(2023, 7, 21);
     private IEnumerable<Stage> _stageFilter = new List<Stage>();
     private string? _djFilter;
     private bool _loading = true;
@@ -20,9 +21,9 @@ public partial class Index
         if (firstRender)
         {
             await PlannerManager.Init();
-            _sessionList.AddRange(PlannerManager._sessionList);
-            _djList.AddRange(PlannerManager._djList);
-            _stageList.AddRange(PlannerManager._stageList);
+            _sessionList.AddRange(PlannerManager.SessionList);
+            _djList.AddRange(PlannerManager.DjList);
+            _stageList.AddRange(PlannerManager.StageList);
             _filteredSessions.AddRange(_sessionList);
             _loading = false;
             StateHasChanged();
@@ -31,7 +32,8 @@ public partial class Index
     
     private Task<IEnumerable<string>> DjSearch(string arg)
     {
-        return Task.FromResult(string.IsNullOrEmpty(arg) ? _djList.Select(x => x.Name) : _djList.Where(x => x.Name.Contains(arg, StringComparison.InvariantCultureIgnoreCase)).Select(x => x.Name));
+        return Task.FromResult(string.IsNullOrEmpty(arg) ? _djList.Select(x => x.Name) : 
+            _djList.Where(x => x.Name.Contains(arg, StringComparison.InvariantCultureIgnoreCase)).Select(x => x.Name));
     }
     
     private void ApplyFilters()
@@ -47,30 +49,35 @@ public partial class Index
         if (_stageFilter.Any() && !string.IsNullOrEmpty(_djFilter))
         {
             if (dj == null) return;
-            _filteredSessions = _sessionList.Where(x => _stageFilter.Any(y => y.id == x.StageId) && x.DJId == dj.id).ToList();
+            _filteredSessions = _sessionList.Where(x => _stageFilter.Any(y => y.Id == x.StageId) && x.DjId == dj.Id).ToList();
             StateHasChanged();
             return;
         }
         // Filter by stage
         if (_stageFilter.Any())
         {
-            _filteredSessions = _sessionList.Where(x => _stageFilter.Any(y => y.id == x.StageId)).ToList();
+            _filteredSessions = _sessionList.Where(x => _stageFilter.Any(y => y.Id == x.StageId)).ToList();
             StateHasChanged();
             return;
         }
         // Filter by dj
         if (dj == null) return;
-        _filteredSessions = _sessionList.Where(x => _djFilter != null && x.DJId == dj.id).ToList();
+        _filteredSessions = _sessionList.Where(x => _djFilter != null && x.DjId == dj.Id).ToList();
         StateHasChanged();
     }
     
-    private void AddUserSession(Session session)
+    private void NavigateToSummary()
     {
-        PlannerManager.AddedSessions.Add(session);
+        if (!PlannerManager.AddedSessions.Any())
+        {
+            Snackbar.Add("Bitte wähle mindestens eine Session aus!", Severity.Info);
+            return;
+        }
+        NavigationManager.NavigateTo("/summary");
     }
-    
-    private void RemoveUserSession(Session session)
+
+    private static string ToStringFunc(Stage arg)
     {
-        PlannerManager.AddedSessions.Remove(session);
+        return arg.Name;
     }
 }

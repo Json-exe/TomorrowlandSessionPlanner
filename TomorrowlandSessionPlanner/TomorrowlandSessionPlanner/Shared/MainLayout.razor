@@ -21,7 +21,9 @@
         <NavMenu/>
     </MudDrawer>
     <MudMainContent>
-        @Body
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-3">
+            @Body
+        </MudContainer>
     </MudMainContent>
     <MudScrollToTop>
         <MudFab Color="Color.Tertiary" Icon="@Icons.Material.Filled.ArrowCircleUp"/>
@@ -35,14 +37,6 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            NavigationManager.NavigateTo("/");
-        }
     }
 }
 
