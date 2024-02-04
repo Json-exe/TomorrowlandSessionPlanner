@@ -46,7 +46,7 @@ else
                                StartIcon="@Icons.Material.Filled.Add">
                         Add DJ
                     </MudButton>
-                    <MudFileUpload T="IBrowserFile?" FilesChanged="ImportDj" Accept=".json" MaximumFileCount="1">
+                    <MudFileUpload T="IBrowserFile?" FilesChanged="@ImportDj" Accept=".json" MaximumFileCount="1">
                         <ButtonTemplate>
                             <MudButton HtmlTag="label"
                                        Variant="Variant.Filled"
@@ -83,7 +83,7 @@ else
                     </RowTemplate>
                 </MudTable>
                 <MudGrid Class="mt-3" Spacing="2">
-                    <MudFileUpload T="IBrowserFile?" FilesChanged="ImportStages" Accept=".json" MaximumFileCount="1">
+                    <MudFileUpload T="IBrowserFile?" FilesChanged="@ImportStages" Accept=".json" MaximumFileCount="1">
                         <ButtonTemplate>
                             <MudButton HtmlTag="label"
                                        Variant="Variant.Filled"
@@ -130,7 +130,7 @@ else
                                StartIcon="@Icons.Material.Filled.Add">
                         Add Session
                     </MudButton>
-                    <MudFileUpload T="IBrowserFile?" FilesChanged="ImportSessions" Accept=".json" MaximumFileCount="1">
+                    <MudFileUpload T="IBrowserFile?" FilesChanged="@ImportSessions" Accept=".json" MaximumFileCount="1">
                         <ButtonTemplate>
                             <MudButton HtmlTag="label"
                                        Variant="Variant.Filled"

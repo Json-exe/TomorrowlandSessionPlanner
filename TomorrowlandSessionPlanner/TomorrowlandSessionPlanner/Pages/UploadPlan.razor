@@ -7,7 +7,7 @@
 <MudStack Justify="Justify.Center" Style="display: flex; align-items: center; height: 100%">
     <MudText Align="Align.Center" GutterBottom="true" Typo="Typo.h3">Bitte Lade hier deine Plan Datei hoch!</MudText>
     <MudPaper Outlined="true" Class="pa-8">
-        <MudFileUpload T="IBrowserFile?" FilesChanged="UploadFiles" Accept=".tmlplanner" MaximumFileCount="1" Required>
+        <MudFileUpload T="IBrowserFile?" FilesChanged="@UploadFiles" Accept=".tmlplanner" MaximumFileCount="1" Required>
             <ButtonTemplate>
                 <MudButton HtmlTag="label"
                            Variant="Variant.Filled"

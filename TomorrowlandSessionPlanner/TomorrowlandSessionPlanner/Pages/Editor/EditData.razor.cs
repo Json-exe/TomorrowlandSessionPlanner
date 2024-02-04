@@ -23,7 +23,7 @@ public partial class EditData : ComponentBase
     private string? _newDj;
     private const bool IsAccessible = true;
 
-    private async void AddSession()
+    private async Task AddSession()
     {
         var parameters = new DialogParameters
         {
@@ -82,7 +82,7 @@ public partial class EditData : ComponentBase
         }
     }
 
-    private async void ImportDj(IBrowserFile? file)
+    private async Task ImportDj(IBrowserFile? file)
     {
         try
         {
@@ -120,7 +120,7 @@ public partial class EditData : ComponentBase
         }
     }
     
-    private async void ImportStages(IBrowserFile? file)
+    private async Task ImportStages(IBrowserFile? file)
     {
         try
         {
@@ -226,7 +226,7 @@ public partial class EditData : ComponentBase
         await AddStages(newStagesData);
     }
 
-    private async void ImportSessions(IBrowserFile? file)
+    private async Task ImportSessions(IBrowserFile? file)
     {
         try
         {
@@ -381,7 +381,7 @@ public partial class EditData : ComponentBase
         _stageList.AddRange(stages);
     }
 
-    private async void AddNewDj()
+    private async Task AddNewDj()
     {
         if (string.IsNullOrEmpty(_newDj) || _djList.Any(x => x.Name == _newDj)) return;
         var dj = new Dj

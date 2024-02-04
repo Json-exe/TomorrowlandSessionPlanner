@@ -12,7 +12,7 @@ public partial class SessionAnalyzeDetailCard : ComponentBase
     [Inject] public required ISnackbar Snackbar { get; set; }
     [Parameter] public EventCallback SessionRemoved { get; set; }
     
-    private async void RemoveUserSession(Session session)
+    private async Task RemoveUserSession(Session session)
     {
         PlannerManager.AddedSessions.Remove(session);
         Snackbar.Add("Session aus deinem Plan entfernt", Severity.Success);

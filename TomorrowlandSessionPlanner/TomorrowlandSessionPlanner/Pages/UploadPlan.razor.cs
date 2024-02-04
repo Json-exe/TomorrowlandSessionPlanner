@@ -8,7 +8,7 @@ namespace TomorrowlandSessionPlanner.Pages;
 
 public partial class UploadPlan : ComponentBase
 {
-    private async void UploadFiles(IBrowserFile? file)
+    private async Task UploadFiles(IBrowserFile? file)
     {
         try
         {

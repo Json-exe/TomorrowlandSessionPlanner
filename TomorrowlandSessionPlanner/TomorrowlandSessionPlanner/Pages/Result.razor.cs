@@ -33,7 +33,7 @@ public partial class Result : ComponentBase, IAsyncDisposable
         }
     }
 
-    private async void ShowSupplements()
+    private async Task ShowSupplements()
     {
         var allSessions = PlannerManager.SessionList.Where(s => !PlannerManager.AddedSessions.Any(ss =>
             IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Any(session => session.Id != s.Id))).ToList();
@@ -41,12 +41,13 @@ public partial class Result : ComponentBase, IAsyncDisposable
         {
             { "supplementSessions", allSessions }
         };
-        await DialogService.ShowAsync<SupplementSessionsDialog>("Supplement Sessions", dialogParameters,
+        var dialogReference = await DialogService.ShowAsync<SupplementSessionsDialog>("Supplement Sessions", dialogParameters,
             new DialogOptions
             {
                 CloseButton = false, MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true, CloseOnEscapeKey = false,
                 DisableBackdropClick = true
             });
+        await dialogReference.Result;
         _sortedSessions = PlannerManager.AddedSessions.OrderBy(s => s.StartTime).ToList();
         StateHasChanged();
     }
@@ -62,7 +63,7 @@ public partial class Result : ComponentBase, IAsyncDisposable
     /// Downloads a file by serializing a sorted list of sessions as JSON and saving it to a file.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
-    private async void DownloadFile()
+    private async Task DownloadFile()
     {
         var json = JsonSerializer.Serialize(_sortedSessions);
         var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data",
@@ -75,7 +76,7 @@ public partial class Result : ComponentBase, IAsyncDisposable
         File.Delete(savePath);
     }
 
-    private async void DownloadHtmlFile()
+    private async Task DownloadHtmlFile()
     {
         var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data",
             $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.html");
