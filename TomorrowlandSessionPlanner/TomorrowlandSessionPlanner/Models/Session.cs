@@ -1,4 +1,6 @@
-﻿namespace TomorrowlandSessionPlanner.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace TomorrowlandSessionPlanner.Models;
 
 public sealed record Session
 {
@@ -7,6 +9,6 @@ public sealed record Session
     public int DjId { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
-    public Stage? Stage { get; private set; }
-    public Dj? Dj { get; private set; }
+    [JsonIgnore] public Stage? Stage { get; private set; }
+    [JsonIgnore] public Dj? Dj { get; private set; }
 }

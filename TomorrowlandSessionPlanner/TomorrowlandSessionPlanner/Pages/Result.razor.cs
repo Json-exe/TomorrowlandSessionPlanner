@@ -64,6 +64,7 @@ public partial class Result : ComponentBase, IAsyncDisposable
     /// <returns>A task representing the asynchronous operation.</returns>
     private async void DownloadFile()
     {
+        // TODO: Map via Mapperly to a DTO object to avoid Object Cycles!
         var json = JsonSerializer.Serialize(_sortedSessions);
         var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data",
             $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.tmlplanner");
