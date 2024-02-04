@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TomorrowlandSessionPlanner.DBContext;
-using TomorrowlandSessionPlanner.Models;
+using TomorrowlandSessionPlanner.Core.DBContext;
+using TomorrowlandSessionPlanner.Core.Model;
 
-namespace TomorrowlandSessionPlanner.Code;
+namespace TomorrowlandSessionPlanner.Core.Code;
 
 public class PlannerManager
 {

@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
-using TomorrowlandSessionPlanner.DBContext;
+using TomorrowlandSessionPlanner.Core.DBContext;
+using TomorrowlandSessionPlanner.Core.Model;
 using TomorrowlandSessionPlanner.Dialogs;
-using TomorrowlandSessionPlanner.Models;
 
 namespace TomorrowlandSessionPlanner.Pages.Editor;
 

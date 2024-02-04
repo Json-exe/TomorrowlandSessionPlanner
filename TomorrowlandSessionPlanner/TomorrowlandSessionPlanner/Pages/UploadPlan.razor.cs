@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
-using TomorrowlandSessionPlanner.Models;
+using TomorrowlandSessionPlanner.Core.Model;
 
 namespace TomorrowlandSessionPlanner.Pages;
 

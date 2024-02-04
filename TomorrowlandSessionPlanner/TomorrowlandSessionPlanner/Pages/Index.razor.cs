@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using TomorrowlandSessionPlanner.Models;
+using TomorrowlandSessionPlanner.Core.Model;
 
 namespace TomorrowlandSessionPlanner.Pages;
 

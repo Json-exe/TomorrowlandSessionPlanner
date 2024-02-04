@@ -23,4 +23,8 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\TomorrowlandSessionPlanner.Core\TomorrowlandSessionPlanner.Core.csproj" />
+    </ItemGroup>
+
 </Project>

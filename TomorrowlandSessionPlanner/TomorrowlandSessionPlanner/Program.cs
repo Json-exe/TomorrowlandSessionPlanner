@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using MudBlazor;
 using MudBlazor.Services;
-using TomorrowlandSessionPlanner.Code;
-using TomorrowlandSessionPlanner.DBContext;
+using TomorrowlandSessionPlanner.Core.Code;
+using TomorrowlandSessionPlanner.Core.DBContext;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
-using TomorrowlandSessionPlanner.Code;
+using TomorrowlandSessionPlanner.Core.Code;
+using TomorrowlandSessionPlanner.Core.Model;
 using TomorrowlandSessionPlanner.Dialogs;
-using TomorrowlandSessionPlanner.Models;
 
 namespace TomorrowlandSessionPlanner.Pages;
 
@@ -64,7 +64,6 @@ public partial class Result : ComponentBase, IAsyncDisposable
     /// <returns>A task representing the asynchronous operation.</returns>
     private async void DownloadFile()
     {
-        // TODO: Map via Mapperly to a DTO object to avoid Object Cycles!
         var json = JsonSerializer.Serialize(_sortedSessions);
         var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data",
             $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.tmlplanner");
@@ -80,7 +79,7 @@ public partial class Result : ComponentBase, IAsyncDisposable
     {
         var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data",
             $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.html");
-        var html = await new HTMLCreator().CreateHTMLTable(_sortedSessions, PlannerManager);
+        var html = await new HtmlCreator().CreateHtmlTable(_sortedSessions, PlannerManager);
         await File.WriteAllTextAsync(savePath, html);
         var bites = await File.ReadAllBytesAsync(savePath);
         var fileName = Path.GetFileName(savePath);

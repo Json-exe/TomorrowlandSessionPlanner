@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
-using TomorrowlandSessionPlanner.Code;
-using TomorrowlandSessionPlanner.Models;
+using TomorrowlandSessionPlanner.Core.Code;
+using TomorrowlandSessionPlanner.Core.Model;
 
 namespace TomorrowlandSessionPlanner.Components;
 

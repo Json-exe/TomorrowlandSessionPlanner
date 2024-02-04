@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace TomorrowlandSessionPlanner.Models;
+namespace TomorrowlandSessionPlanner.Core.Model;
 
 public sealed record Session
 {

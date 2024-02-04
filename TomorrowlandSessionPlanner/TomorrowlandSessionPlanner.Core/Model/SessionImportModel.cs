@@ -1,4 +1,4 @@
-﻿namespace TomorrowlandSessionPlanner.Models;
+﻿namespace TomorrowlandSessionPlanner.Core.Model;
 
 public sealed record SessionImportModel
 {

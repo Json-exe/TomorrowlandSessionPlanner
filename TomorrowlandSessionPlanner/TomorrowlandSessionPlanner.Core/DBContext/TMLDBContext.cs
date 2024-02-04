@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TomorrowlandSessionPlanner.Models;
+using TomorrowlandSessionPlanner.Core.Model;
 
-namespace TomorrowlandSessionPlanner.DBContext;
+namespace TomorrowlandSessionPlanner.Core.DBContext;
 
 public class TmldbContext : DbContext
 {
