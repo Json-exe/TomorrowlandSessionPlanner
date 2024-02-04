@@ -14,13 +14,13 @@ public partial class EditData : ComponentBase
 {
     [Inject] public required IDbContextFactory<TmldbContext> DbContextFactory { get; set; }
     
-    private readonly List<Dj> _djList = new();
-    private readonly List<Stage> _stageList = new();
-    private readonly List<Session> _sessionList = new();
+    private readonly List<Dj> _djList = [];
+    private readonly List<Stage> _stageList = [];
+    private readonly List<Session> _sessionList = [];
     private bool _loading = true;
     private int _selectedStage;
     private DateTime? _startDate;
-    private string? _newDj;
+    private string _newDj = string.Empty;
     private const bool IsAccessible = true;
 
     private async Task AddSession()
