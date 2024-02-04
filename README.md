@@ -14,11 +14,12 @@
 - [x] Basic UI design
 - [x] Session filtering functionality
 - [ ] Simple session export to PDF
-- [X] Update Database-Set to include data for Weekend 2
-- [X] Update Database-Set to include data for Weekend 1
+- [ ] Re-Enable Website when TML-Timetable is fully released
+  - [ ] Update Database-Set to include data for Weekend 1
+  - [ ] Update Database-Set to include data for Weekend 2
+- [ ] Optimize SessionGrabber or create a Sync-Service
 
 ## Features!
-
 
 - View sessions easily
 - Filter sessions by stage, DJ, and weekend
