@@ -58,6 +58,8 @@ else
                    FullWidth Style="width: 200px;">Download Daten</MudButton>
         <MudButton Size="Size.Large" Class="ml-2" OnClick="@DownloadHtmlFile" Variant="Variant.Filled" 
                    Color="Color.Info" FullWidth Style="width: 200px;">Download HTML</MudButton>
+        <MudButton Size="Size.Large" Class="ml-2" OnClick="@GeneratePdfFile" Variant="Variant.Filled" 
+                           Color="Color.Info" FullWidth Style="width: 200px;">Download PDF</MudButton>
         <MudButton Size="Size.Large" Class="ml-2" OnClick="@(() => NavigationManager.NavigateTo("/"))" 
                    Variant="Variant.Filled" Color="Color.Info" FullWidth Style="width: 200px;">Plan anpassen</MudButton>
     </MudGrid>

@@ -2,9 +2,14 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
+using QuestPDF.Previewer;
 using TomorrowlandSessionPlanner.Core.Code;
 using TomorrowlandSessionPlanner.Core.Model;
 using TomorrowlandSessionPlanner.Dialogs;
+using Colors = QuestPDF.Helpers.Colors;
 
 namespace TomorrowlandSessionPlanner.Pages;
 
@@ -87,6 +92,62 @@ public partial class Result : ComponentBase, IAsyncDisposable
         if (_jsModule != null) 
             await _jsModule.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
         File.Delete(savePath);
+    }
+
+    private async Task GeneratePdfFile()
+    {
+        var document = Document.Create(container =>
+        {
+            container.Page(descriptor =>
+            {
+                descriptor.Size(PageSizes.A4);
+                descriptor.DefaultTextStyle(style =>
+                {
+                    style.FontSize(12);
+                    return style;
+                });
+                descriptor.Margin(2, Unit.Centimetre);
+                descriptor.Header()
+                    .Text("Dein Plan")
+                    .Bold()
+                    .Underline()
+                    .FontSize(38)
+                    .FontColor("#4b0076");
+
+                descriptor.Content().Table(tableDescriptor =>
+                { 
+                    tableDescriptor.ColumnsDefinition(columns =>
+                    {
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                    });
+                    tableDescriptor.Header(cellDescriptor =>
+                    {
+                        cellDescriptor.Cell().Text("Stage").Bold().FontSize(20).FontColor("#4b0076");
+                        cellDescriptor.Cell().Text("Artist").Bold().FontSize(20).FontColor("#4b0076");
+                        cellDescriptor.Cell().Text("Start").Bold().FontSize(20).FontColor("#4b0076");
+                        cellDescriptor.Cell().Text("Ende").Bold().FontSize(20).FontColor("#4b0076");
+                    });
+                    for (uint i = 1; i <= _sortedSessions.Count; i++)
+                    {
+                        var session = _sortedSessions[(int)i - 1];
+                        tableDescriptor.Cell().Row(i).Border(0.04f, Unit.Centimetre);
+                            tableDescriptor.Cell().Row(i)
+                                .Column(1).Text(session.Stage!.Name);
+                            tableDescriptor.Cell().Row(i)
+                                .Column(2).Text(session.Dj!.Name);
+                            tableDescriptor.Cell().Row(i)
+                                .Column(3).Text(session.StartTime.ToString("dd.M - hh:mm"));
+                            tableDescriptor.Cell().Row(i)
+                                .Column(4).Text(session.EndTime.ToString("dd.M - hh:mm"));
+                    }
+                });
+            });
+        });
+        
+        await document.ShowInPreviewerAsync();
     }
 
     public async ValueTask DisposeAsync()
