@@ -46,7 +46,8 @@ public partial class Result : ComponentBase, IAsyncDisposable
         {
             { "supplementSessions", allSessions }
         };
-        var dialogReference = await DialogService.ShowAsync<SupplementSessionsDialog>("Supplement Sessions", dialogParameters,
+        var dialogReference = await DialogService.ShowAsync<SupplementSessionsDialog>("Supplement Sessions",
+            dialogParameters,
             new DialogOptions
             {
                 CloseButton = false, MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true, CloseOnEscapeKey = false,
@@ -63,7 +64,7 @@ public partial class Result : ComponentBase, IAsyncDisposable
         // das Start von session1 vor dem Ende von session2 liegt
         return session1.EndTime > session2.StartTime && session1.StartTime < session2.EndTime;
     }
-    
+
     /// <summary>
     /// Downloads a file by serializing a sorted list of sessions as JSON and saving it to a file.
     /// </summary>
@@ -76,7 +77,7 @@ public partial class Result : ComponentBase, IAsyncDisposable
         await File.WriteAllTextAsync(savePath, json);
         var bites = await File.ReadAllBytesAsync(savePath);
         var fileName = Path.GetFileName(savePath);
-        if (_jsModule != null) 
+        if (_jsModule != null)
             await _jsModule.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
         File.Delete(savePath);
     }
@@ -89,7 +90,7 @@ public partial class Result : ComponentBase, IAsyncDisposable
         await File.WriteAllTextAsync(savePath, html);
         var bites = await File.ReadAllBytesAsync(savePath);
         var fileName = Path.GetFileName(savePath);
-        if (_jsModule != null) 
+        if (_jsModule != null)
             await _jsModule.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
         File.Delete(savePath);
     }
@@ -115,7 +116,19 @@ public partial class Result : ComponentBase, IAsyncDisposable
                     .FontColor("#4b0076");
 
                 descriptor.Content().Table(tableDescriptor =>
-                { 
+                {
+                    IContainer DefaultCellStyle(IContainer container, string backgroundColor)
+                    {
+                        return container
+                            .Border(1)
+                            .BorderColor(Colors.Grey.Lighten1)
+                            .Background(backgroundColor)
+                            .PaddingVertical(5)
+                            .PaddingHorizontal(10)
+                            .AlignCenter()
+                            .AlignMiddle();
+                    }
+
                     tableDescriptor.ColumnsDefinition(columns =>
                     {
                         columns.RelativeColumn();
@@ -123,31 +136,42 @@ public partial class Result : ComponentBase, IAsyncDisposable
                         columns.RelativeColumn();
                         columns.RelativeColumn();
                     });
+
                     tableDescriptor.Header(cellDescriptor =>
                     {
-                        cellDescriptor.Cell().Text("Stage").Bold().FontSize(20).FontColor("#4b0076");
-                        cellDescriptor.Cell().Text("Artist").Bold().FontSize(20).FontColor("#4b0076");
-                        cellDescriptor.Cell().Text("Start").Bold().FontSize(20).FontColor("#4b0076");
-                        cellDescriptor.Cell().Text("Ende").Bold().FontSize(20).FontColor("#4b0076");
+                        cellDescriptor.Cell().Element(CellStyle).Text("Stage").Bold().FontSize(20).FontColor("#4b0076");
+                        cellDescriptor.Cell().Element(CellStyle).Text("Artist").Bold().FontSize(20)
+                            .FontColor("#4b0076");
+                        cellDescriptor.Cell().Element(CellStyle).Text("Start").Bold().FontSize(20).FontColor("#4b0076");
+                        cellDescriptor.Cell().Element(CellStyle).Text("Ende").Bold().FontSize(20).FontColor("#4b0076");
+                        return;
+                        IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.Grey.Lighten3);
                     });
+
                     for (uint i = 1; i <= _sortedSessions.Count; i++)
                     {
                         var session = _sortedSessions[(int)i - 1];
-                        tableDescriptor.Cell().Row(i).Border(0.04f, Unit.Centimetre);
-                            tableDescriptor.Cell().Row(i)
-                                .Column(1).Text(session.Stage!.Name);
-                            tableDescriptor.Cell().Row(i)
-                                .Column(2).Text(session.Dj!.Name);
-                            tableDescriptor.Cell().Row(i)
-                                .Column(3).Text(session.StartTime.ToString("dd.M - hh:mm"));
-                            tableDescriptor.Cell().Row(i)
-                                .Column(4).Text(session.EndTime.ToString("dd.M - hh:mm"));
+                        tableDescriptor.Cell().Row(i)
+                            .Column(1).Element(CellStyle).Text(session.Stage!.Name);
+                        tableDescriptor.Cell().Row(i)
+                            .Column(2).Element(CellStyle).Text(session.Dj!.Name);
+                        tableDescriptor.Cell().Row(i)
+                            .Column(3).Element(CellStyle).Text(session.StartTime.ToString("dd.M - HH:mm"));
+                        tableDescriptor.Cell().Row(i)
+                            .Column(4).Element(CellStyle).Text(session.EndTime.ToString("dd.M - HH:mm"));
+                        continue;
+
+                        IContainer CellStyle(IContainer container) =>
+                            DefaultCellStyle(container, Colors.White).ShowOnce();
                     }
                 });
             });
         });
-        
-        await document.ShowInPreviewerAsync();
+
+        QuestPDF.Settings.License = LicenseType.Community;
+        var pdfData = document.GeneratePdf();
+        if (_jsModule != null)
+            await _jsModule.InvokeVoidAsync("saveAsFile", "TML-Session-Planner-Plan.pdf", Convert.ToBase64String(pdfData));
     }
 
     public async ValueTask DisposeAsync()
