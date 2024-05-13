@@ -4,7 +4,7 @@ using TomorrowlandSessionPlanner.Core.Model;
 
 namespace TomorrowlandSessionPlanner.Components;
 
-internal abstract class ViewModelComponent<TViewModel> : ComponentBase, IAsyncDisposable where TViewModel : ViewModel
+public abstract class ViewModelComponent<TViewModel> : ComponentBase, IAsyncDisposable where TViewModel : ViewModel
 {
     [Inject] protected TViewModel ViewModel { get; set; } = default!;
 
