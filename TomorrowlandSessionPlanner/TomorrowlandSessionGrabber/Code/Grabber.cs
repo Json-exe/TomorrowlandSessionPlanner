@@ -11,7 +11,7 @@ public class Grabber
 {
     private const string BaseUrl = "https://www.tomorrowland.com/en/festival/line-up/stages/";
     private ReadOnlyCollection<IWebElement>? _eventDayButtons;
-    private IWebDriver _driver = null!;
+    private ChromeDriver _driver = null!;
     private int _selectedDay;
     private readonly List<Session> _sessions = [];
 
@@ -27,7 +27,6 @@ public class Grabber
         var driver = new ChromeDriver(options);
         _driver = driver;
         driver.Navigate().GoToUrl(BaseUrl);
-        // driver.ExecuteScript("Cookiebot.dialog.submitConsent()");
         if (grabberOptions.Weekend == Weekend.Weekend1)
         {
             var weekendSwitch = driver.FindElement(By.ClassName("weekend-switch"));
