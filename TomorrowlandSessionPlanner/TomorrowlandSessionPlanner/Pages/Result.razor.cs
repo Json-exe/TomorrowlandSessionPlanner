@@ -6,42 +6,32 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using QuestPDF.Previewer;
+using TomorrowlandSessionPlanner.Components;
 using TomorrowlandSessionPlanner.Core.Code;
 using TomorrowlandSessionPlanner.Core.Model;
+using TomorrowlandSessionPlanner.Core.ViewModel;
 using TomorrowlandSessionPlanner.Dialogs;
 using Colors = QuestPDF.Helpers.Colors;
 
 namespace TomorrowlandSessionPlanner.Pages;
 
-public partial class Result : ComponentBase, IAsyncDisposable
+public partial class Result : ViewModelComponent<ResultViewModel>
 {
-    private bool _loading = true;
-    private List<Session> _sortedSessions = [];
-    private IJSObjectReference? _jsModule;
     private readonly DateTime _weekend2Start = new(2023, 7, 28);
     private readonly DateTime _weekend1Start = new(2023, 7, 21);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Pages/Result.razor.js");
         if (firstRender)
         {
-            if (PlannerManager.AddedSessions.Count == 0)
-            {
-                NavigationManager.NavigateTo("/", true, true);
-                return;
-            }
-
-            _sortedSessions = PlannerManager.AddedSessions.OrderBy(s => s.StartTime).ToList();
-            _loading = false;
-            StateHasChanged();
+            await ViewModel.InitResultPageCommand.ExecuteAsync(null);
         }
     }
 
     private async Task ShowSupplements()
     {
         var allSessions = PlannerManager.SessionList.Where(s => !PlannerManager.AddedSessions.Any(ss =>
-            IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Any(session => session.Id != s.Id))).ToList();
+            IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Exists(session => session.Id != s.Id))).ToList();
         var dialogParameters = new DialogParameters
         {
             { "supplementSessions", allSessions }
@@ -54,7 +44,7 @@ public partial class Result : ComponentBase, IAsyncDisposable
                 DisableBackdropClick = true
             });
         await dialogReference.Result;
-        _sortedSessions = PlannerManager.AddedSessions.OrderBy(s => s.StartTime).ToList();
+        ViewModel.SortedSessions = PlannerManager.AddedSessions.OrderBy(s => s.StartTime).ToList();
         StateHasChanged();
     }
 
@@ -71,14 +61,14 @@ public partial class Result : ComponentBase, IAsyncDisposable
     /// <returns>A task representing the asynchronous operation.</returns>
     private async Task DownloadFile()
     {
-        var json = JsonSerializer.Serialize(_sortedSessions);
+        var json = JsonSerializer.Serialize(ViewModel.SortedSessions);
         var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data",
             $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.tmlplanner");
         await File.WriteAllTextAsync(savePath, json);
         var bites = await File.ReadAllBytesAsync(savePath);
         var fileName = Path.GetFileName(savePath);
-        if (_jsModule != null)
-            await _jsModule.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
+        if (ViewModel.ObjectReference != null)
+            await ViewModel.ObjectReference.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
         File.Delete(savePath);
     }
 
@@ -86,20 +76,20 @@ public partial class Result : ComponentBase, IAsyncDisposable
     {
         var savePath = Path.Combine(Directory.GetCurrentDirectory(), "Data",
             $"SessionPlan{DateTime.Now:ddMMyyyyHHmmss}.html");
-        var html = await new HtmlCreator().CreateHtmlTable(_sortedSessions, PlannerManager);
+        var html = await new HtmlCreator().CreateHtmlTable(ViewModel.SortedSessions, PlannerManager);
         await File.WriteAllTextAsync(savePath, html);
         var bites = await File.ReadAllBytesAsync(savePath);
         var fileName = Path.GetFileName(savePath);
-        if (_jsModule != null)
-            await _jsModule.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
+        if (ViewModel.ObjectReference != null)
+            await ViewModel.ObjectReference.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(bites));
         File.Delete(savePath);
     }
 
     private async Task GeneratePdfFile()
     {
-        var document = Document.Create(container =>
+        var document = Document.Create(documentContainer =>
         {
-            container.Page(descriptor =>
+            documentContainer.Page(descriptor =>
             {
                 descriptor.Size(PageSizes.A4);
                 descriptor.DefaultTextStyle(style =>
@@ -108,15 +98,50 @@ public partial class Result : ComponentBase, IAsyncDisposable
                     return style;
                 });
                 descriptor.Margin(2, Unit.Centimetre);
+                const string fontColor = "#4b0076";
                 descriptor.Header()
                     .Text("Dein Plan")
                     .Bold()
                     .Underline()
                     .FontSize(38)
-                    .FontColor("#4b0076");
+                    .FontColor(fontColor);
 
                 descriptor.Content().Table(tableDescriptor =>
                 {
+                    tableDescriptor.ColumnsDefinition(columns =>
+                    {
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                    });
+
+                    tableDescriptor.Header(cellDescriptor =>
+                    {
+                        cellDescriptor.Cell().Element(CellStyle).Text("Stage").Bold().FontSize(20).FontColor(fontColor);
+                        cellDescriptor.Cell().Element(CellStyle).Text("Artist").Bold().FontSize(20)
+                            .FontColor(fontColor);
+                        cellDescriptor.Cell().Element(CellStyle).Text("Start").Bold().FontSize(20).FontColor(fontColor);
+                        cellDescriptor.Cell().Element(CellStyle).Text("Ende").Bold().FontSize(20).FontColor(fontColor);
+                        IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.Grey.Lighten3);
+                    });
+
+                    for (uint i = 1; i <= ViewModel.SortedSessions.Count; i++)
+                    {
+                        var session = ViewModel.SortedSessions[(int)i - 1];
+                        tableDescriptor.Cell().Row(i)
+                            .Column(1).Element(CellStyle).Text(session.Stage!.Name);
+                        tableDescriptor.Cell().Row(i)
+                            .Column(2).Element(CellStyle).Text(session.Dj!.Name);
+                        tableDescriptor.Cell().Row(i)
+                            .Column(3).Element(CellStyle).Text(session.StartTime.ToString("dd.M - HH:mm"));
+                        tableDescriptor.Cell().Row(i)
+                            .Column(4).Element(CellStyle).Text(session.EndTime.ToString("dd.M - HH:mm"));
+
+                        IContainer CellStyle(IContainer container) =>
+                            DefaultCellStyle(container, Colors.White).ShowOnce();
+                    }
+
                     IContainer DefaultCellStyle(IContainer container, string backgroundColor)
                     {
                         return container
@@ -128,54 +153,18 @@ public partial class Result : ComponentBase, IAsyncDisposable
                             .AlignCenter()
                             .AlignMiddle();
                     }
-
-                    tableDescriptor.ColumnsDefinition(columns =>
-                    {
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                    });
-
-                    tableDescriptor.Header(cellDescriptor =>
-                    {
-                        cellDescriptor.Cell().Element(CellStyle).Text("Stage").Bold().FontSize(20).FontColor("#4b0076");
-                        cellDescriptor.Cell().Element(CellStyle).Text("Artist").Bold().FontSize(20)
-                            .FontColor("#4b0076");
-                        cellDescriptor.Cell().Element(CellStyle).Text("Start").Bold().FontSize(20).FontColor("#4b0076");
-                        cellDescriptor.Cell().Element(CellStyle).Text("Ende").Bold().FontSize(20).FontColor("#4b0076");
-                        return;
-                        IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.Grey.Lighten3);
-                    });
-
-                    for (uint i = 1; i <= _sortedSessions.Count; i++)
-                    {
-                        var session = _sortedSessions[(int)i - 1];
-                        tableDescriptor.Cell().Row(i)
-                            .Column(1).Element(CellStyle).Text(session.Stage!.Name);
-                        tableDescriptor.Cell().Row(i)
-                            .Column(2).Element(CellStyle).Text(session.Dj!.Name);
-                        tableDescriptor.Cell().Row(i)
-                            .Column(3).Element(CellStyle).Text(session.StartTime.ToString("dd.M - HH:mm"));
-                        tableDescriptor.Cell().Row(i)
-                            .Column(4).Element(CellStyle).Text(session.EndTime.ToString("dd.M - HH:mm"));
-                        continue;
-
-                        IContainer CellStyle(IContainer container) =>
-                            DefaultCellStyle(container, Colors.White).ShowOnce();
-                    }
                 });
             });
         });
 
         QuestPDF.Settings.License = LicenseType.Community;
         var pdfData = document.GeneratePdf();
-        if (_jsModule != null)
-            await _jsModule.InvokeVoidAsync("saveAsFile", "TML-Session-Planner-Plan.pdf", Convert.ToBase64String(pdfData));
+        if (ViewModel.ObjectReference != null)
+            await ViewModel.ObjectReference.InvokeVoidAsync("saveAsFile", "TML-Session-Planner-Plan.pdf", Convert.ToBase64String(pdfData));
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (_jsModule != null) await _jsModule.DisposeAsync();
+        if (ViewModel.ObjectReference != null) await ViewModel.ObjectReference.DisposeAsync();
     }
 }

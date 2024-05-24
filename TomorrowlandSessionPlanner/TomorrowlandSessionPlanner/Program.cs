@@ -4,6 +4,7 @@ using MudBlazor;
 using MudBlazor.Services;
 using TomorrowlandSessionPlanner.Core.Code;
 using TomorrowlandSessionPlanner.Core.DBContext;
+using TomorrowlandSessionPlanner.Core.ViewModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,17 +20,7 @@ builder.Services.AddMudServices(configuration =>
 builder.Services.AddDbContextFactory<TmldbContext>(optionsBuilder => 
     optionsBuilder.UseSqlite("Data Source=data/tmldata.db"));
 builder.Services.AddScoped<PlannerManager>();
-
-// if (!builder.Environment.IsDevelopment())
-// {
-//     builder.WebHost.ConfigureKestrel(options =>
-//     {
-//         options.Listen(IPAddress.Loopback, 5002, listenOptions =>
-//         {
-//             listenOptions.UseHttps(new X509Certificate2("/home/jason/certs/tmlPlanner/certificate.pfx", Environment.GetCommandLineArgs()[0]));
-//         });
-//     });
-// }
+builder.Services.AddViewModel();
 
 var app = builder.Build();
 

@@ -4,10 +4,11 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 @inject IDialogService DialogService
+@inherits ViewModelComponent<TomorrowlandSessionPlanner.Core.ViewModel.ResultViewModel>
 
 <PageTitle>Result</PageTitle>
 
-@if (_loading)
+@if (ViewModel.InitResultPageCommand.IsRunning)
 {
     <MudStack Justify="Justify.Center" Style="display: flex; align-items: center;">
         <MudProgressCircular Size="Size.Large" Indeterminate="true"/>
@@ -16,12 +17,12 @@
 }
 else
 {
-    @if (_sortedSessions.Any(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
+    @if (ViewModel.SortedSessions.Exists(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
     {
         <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom>Dein Plan Weekend 1</MudText>
         <MudGrid Justify="Justify.Center">
             <MudTimeline>
-                @foreach (var session in _sortedSessions.Where(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
+                @foreach (var session in ViewModel.SortedSessions.Where(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
                 {
                     <MudTimelineItem Size="Size.Medium" Variant="Variant.Outlined" Color="Color.Info" 
                                      TimelineAlign="TimelineAlign.Default" Style="width: 1000px;" @key="session.Id">
@@ -32,12 +33,12 @@ else
         </MudGrid>
     }
     
-    @if (_sortedSessions.Any(x => x.StartTime >= _weekend2Start))
+    @if (ViewModel.SortedSessions.Exists(x => x.StartTime >= _weekend2Start))
     {
         <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom Class="mt-3">Dein Plan Weekend 2</MudText>
         <MudGrid Justify="Justify.Center">
             <MudTimeline>
-                @foreach (var session in _sortedSessions.Where(x => x.StartTime >= _weekend2Start))
+                @foreach (var session in ViewModel.SortedSessions.Where(x => x.StartTime >= _weekend2Start))
                 {
                     <MudTimelineItem Size="Size.Medium" Variant="Variant.Outlined" Color="Color.Info" 
                                      TimelineAlign="TimelineAlign.Default" Style="width: 1000px;" @key="session.Id">

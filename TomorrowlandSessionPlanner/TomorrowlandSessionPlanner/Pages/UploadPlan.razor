@@ -10,6 +10,7 @@
                            Variant="Variant.Filled"
                            Color="Color.Primary"
                            StartIcon="@Icons.Material.Filled.CloudUpload"
+                           Disabled="@ViewModel.UploadFileCommand.IsRunning"
                            for="@context">
                     Upload Plan
                 </MudButton>
