@@ -2,7 +2,7 @@
 using MudBlazor;
 using TomorrowlandSessionPlanner.Core.Model;
 
-namespace TomorrowlandSessionPlanner.Dialogs;
+namespace TomorrowlandSessionPlanner.Core.Dialogs;
 
 public partial class ImportSessionInfoDialog : ComponentBase
 {

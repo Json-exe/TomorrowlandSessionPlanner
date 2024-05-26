@@ -8,6 +8,7 @@ public static class DependencyInjectionExtension
     {
         return services
             .AddTransient<UploadPlanViewModel>()
-            .AddTransient<SessionAnalyzerViewModel>();
+            .AddTransient<SessionAnalyzerViewModel>()
+            .AddTransient<ResultViewModel>();
     }
 }

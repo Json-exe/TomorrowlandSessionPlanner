@@ -5,8 +5,9 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using TomorrowlandSessionPlanner.Core.DBContext;
+using TomorrowlandSessionPlanner.Core.Dialogs;
 using TomorrowlandSessionPlanner.Core.Model;
-using TomorrowlandSessionPlanner.Dialogs;
+using ImportSessionInfoDialog = TomorrowlandSessionPlanner.Core.Dialogs.ImportSessionInfoDialog;
 
 namespace TomorrowlandSessionPlanner.Pages.Editor;
 
@@ -53,6 +54,7 @@ public partial class EditData : ComponentBase
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!IsAccessible)
+            // ReSharper disable once HeuristicUnreachableCode
         {
             NavigationManager.NavigateTo("/");
             return;
@@ -88,12 +90,12 @@ public partial class EditData : ComponentBase
         {
             if (file == null)
             {
-                throw new Exception("No File selected!");
+                throw new ArgumentNullException(nameof(file), "No File selected!");
             }
 
             if (!file.Name.EndsWith(".json"))
             {
-                throw new Exception("Wrong File Format!");
+                throw new FormatException("Wrong File Format!");
             }
 
             var fileContent = file.OpenReadStream();
@@ -101,7 +103,7 @@ public partial class EditData : ComponentBase
             var sessionsToImport = JsonSerializer.Deserialize<List<SessionImportModel>>(json);
             if (sessionsToImport == null)
             {
-                throw new Exception("No Sessions found!");
+                return;
             }
 
             Snackbar.Add(
@@ -126,12 +128,12 @@ public partial class EditData : ComponentBase
         {
             if (file == null)
             {
-                throw new Exception("No File selected!");
+                throw new ArgumentNullException(nameof(file), "No File selected!");
             }
 
             if (!file.Name.EndsWith(".json"))
             {
-                throw new Exception("Wrong File Format!");
+                throw new FormatException("Wrong File Format!");
             }
 
             var fileContent = file.OpenReadStream();
@@ -139,7 +141,7 @@ public partial class EditData : ComponentBase
             var sessionsToImport = JsonSerializer.Deserialize<List<SessionImportModel>>(json);
             if (sessionsToImport == null)
             {
-                throw new Exception("No Sessions found!");
+                return;
             }
 
             Snackbar.Add(
@@ -164,7 +166,7 @@ public partial class EditData : ComponentBase
         var newDjsData = new List<Dj>();
         foreach (var djImportModel in dj)
         {
-            if (_djList.Any(x => x.Name == djImportModel.DjName) || newDjs.Any(x => x.DjName == djImportModel.DjName)) continue;
+            if (_djList.Exists(x => x.Name == djImportModel.DjName) || newDjs.Exists(x => x.DjName == djImportModel.DjName)) continue;
             var newDj = new Dj
             {
                 Name = djImportModel.DjName
@@ -201,7 +203,7 @@ public partial class EditData : ComponentBase
             stageImportModel.StageName = stageImportModel.StageName.ToUpper() == "CORE"
                 ? stageImportModel.StageName.ToUpper()
                 : stageImportModel.StageName;
-            if (_stageList.Any(x => x.Name == stageImportModel.StageName) || newStages.Any(x => x.StageName == stageImportModel.StageName)) continue;
+            if (_stageList.Exists(x => x.Name == stageImportModel.StageName) || newStages.Exists(x => x.StageName == stageImportModel.StageName)) continue;
             var newStage = new Stage
             {
                 Name = stageImportModel.StageName
@@ -232,12 +234,12 @@ public partial class EditData : ComponentBase
         {
             if (file == null)
             {
-                throw new Exception("No File selected!");
+                throw new ArgumentNullException(nameof(file), "No File selected!");
             }
 
             if (!file.Name.EndsWith(".json"))
             {
-                throw new Exception("Wrong File Format!");
+                throw new FormatException("Wrong File Format!");
             }
 
             var fileContent = file.OpenReadStream();
@@ -245,7 +247,7 @@ public partial class EditData : ComponentBase
             var sessionsToImport = JsonSerializer.Deserialize<List<SessionImportModel>>(json);
             if (sessionsToImport == null)
             {
-                throw new Exception("No Sessions found!");
+                return;
             }
 
             Snackbar.Add(
@@ -285,7 +287,7 @@ public partial class EditData : ComponentBase
                     StartTime = sessionImportModel.StartTime,
                     EndTime = sessionImportModel.EndTime
                 };
-                if (_sessionList.Any(x =>
+                if (_sessionList.Exists(x =>
                         x.StageId == session.StageId && x.StartTime == session.StartTime &&
                         x.EndTime == session.EndTime))
                 {
@@ -383,7 +385,7 @@ public partial class EditData : ComponentBase
 
     private async Task AddNewDj()
     {
-        if (string.IsNullOrEmpty(_newDj) || _djList.Any(x => x.Name == _newDj)) return;
+        if (string.IsNullOrEmpty(_newDj) || _djList.Exists(x => x.Name == _newDj)) return;
         var dj = new Dj
         {
             Name = _newDj

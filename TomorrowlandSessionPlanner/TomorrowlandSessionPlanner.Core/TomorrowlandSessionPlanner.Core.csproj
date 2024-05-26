@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -16,10 +16,17 @@
       </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.4" />
       <PackageReference Include="MudBlazor" Version="6.19.1" />
+      <PackageReference Include="QuestPDF" Version="2024.3.10" />
     </ItemGroup>
 
     <ItemGroup>
       <Compile Remove="Models\Migrations\20240508185026_Initial.Designer.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Dialogs\AddSessionDialog.razor" />
+      <AdditionalFiles Include="Dialogs\ImportSessionInfoDialog.razor" />
+      <AdditionalFiles Include="Dialogs\SupplementSessionsDialog.razor" />
     </ItemGroup>
 
 </Project>
