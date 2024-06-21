@@ -9,11 +9,12 @@ namespace TomorrowlandSessionGrabber.Code;
 
 public class Grabber
 {
-    private const string BaseUrl = "https://www.tomorrowland.com/en/festival/line-up/stages/";
+    private const string BaseUrl = "https://belgium.tomorrowland.com/en/line-up/?page=artists";
     private ReadOnlyCollection<IWebElement>? _eventDayButtons;
     private ChromeDriver _driver = null!;
     private int _selectedDay;
     private readonly List<Session> _sessions = [];
+    private IWebElement? _liveLineupElement;
 
     public void Start(GrabberOptions grabberOptions)
     {
@@ -27,30 +28,10 @@ public class Grabber
         var driver = new ChromeDriver(options);
         _driver = driver;
         driver.Navigate().GoToUrl(BaseUrl);
-        if (grabberOptions.Weekend == Weekend.Weekend1)
-        {
-            var weekendSwitch = driver.FindElement(By.ClassName("weekend-switch"));
-            var weekend1Button = weekendSwitch.FindElement(By.ClassName("weekend1"));
-            weekend1Button.Click();
-            var eventDaysWrapper = driver.FindElement(By.ClassName("eventdays-wrapper"));
-            var eventDays = eventDaysWrapper.FindElement(By.XPath(".//div[@data-weekend='1']"));
-            _eventDayButtons = eventDays.FindElements(By.XPath(".//div"));
-            Console.WriteLine("Grabbing weekend 1...");
-            GetStages();
-        }
-        else
-        {
-            var weekendSwitch = driver.FindElement(By.ClassName("weekend-switch"));
-            var weekend2Button = weekendSwitch.FindElement(By.ClassName("weekend2"));
-            weekend2Button.Click();
-            var eventDaysWrapper = driver.FindElement(By.ClassName("eventdays-wrapper"));
-            var eventDays = eventDaysWrapper.FindElement(By.XPath(".//div[@data-weekend='2']"));
-            // Inside eventDays there are 3 divs, one for each day. They have a data-date attribute with the date. Get the 3 divs
-            _eventDayButtons = eventDays.FindElements(By.XPath(".//div"));
-            Console.WriteLine("Grabbing weekend 2...");
-            GetStages();
-        }
-
+        Console.WriteLine("Press ANY to continue!");
+        Console.ReadLine();
+        _liveLineupElement = driver.FindElement(By.TagName("tml-live-lineup"));
+        GetStages();
         SaveDataAsJson();
     }
 
@@ -68,41 +49,35 @@ public class Grabber
 
     private void GetStages()
     {
-        var lineupDiv = _driver.FindElement(By.ClassName("lineup__page--stages"));
-        var eventDaysLineUp = lineupDiv.FindElement(By.ClassName("eventdays"));
-        var eventDay = eventDaysLineUp.FindElements(By.ClassName("eventday")).First(x => x.Displayed);
-        var stages = eventDay.FindElements(By.ClassName("stage"));
-        EnumerateStages(stages);
-        DaySwitch();
+        var lineupDiv = _liveLineupElement!.FindElement(By.XPath(".//div[contains(@class, '_responsiveMasonry_')]"));
+        var artistList = lineupDiv.FindElements(By.XPath(".//div[contains(@class, '_masonryItem_')]"));
+        EnumerateArtists(artistList);
     }
 
-    private void DaySwitch()
+    private void EnumerateArtists(ReadOnlyCollection<IWebElement> artistLists)
     {
-        _selectedDay++;
-        if (_selectedDay >= _eventDayButtons?.Count) return;
-        var button = _eventDayButtons![_selectedDay];
-        button.Click();
-        Thread.Sleep(500);
-        GetStages();
-    }
-
-    private void EnumerateStages(ReadOnlyCollection<IWebElement> stages)
-    {
-        foreach (var stage in stages)
+        foreach (var artistList in artistLists)
         {
-            var heading = stage.FindElement(By.ClassName("stage__heading")).FindElement(By.TagName("h4"));
-            var content = stage.FindElement(By.ClassName("stage__content")).FindElements(By.TagName("li"));
-            foreach (var stageContent in content)
+            var artists =
+                artistList.FindElements(
+                    By.XPath(".//div[contains(@class, '_list_')]/ul[contains(@class, '_artists_')]"));
+            foreach (var artist in artists)
             {
-                var session = new Session
-                {
-                    StageName = heading.Text
-                };
-                var djData = stageContent.FindElement(By.TagName("a"));
+                var djInformationButton = artist.FindElement(By.TagName("button"));
+                
+                ((IJavaScriptExecutor) _driver).ExecuteScript("arguments[0].scrollIntoView(true);", djInformationButton);
+                
+                Thread.Sleep(700);
+                djInformationButton.Click();
+                // Search for a div with _overlay_ as class that has a button with the class _close_button_ inside. I want to get the div not the button!
+                var overlay = _liveLineupElement!.FindElement(
+                    By.XPath(".//div[contains(@class, '_overlay_')]/button[contains(@class, '_close_button_')]/.."));
+                var content = overlay.FindElement(By.XPath(".//div[contains(@class, '_content_')]"));
+                var djName = content.FindElement(By.XPath(".//h1")).Text;
+                var performanceContainer = content.FindElement(By.XPath(".//div[contains(@class, '_performances_')]"));
+                var performances =
+                    performanceContainer.FindElements(By.XPath(".//div[contains(@class, '_performance_')]"));
 
-                ApplySessionTimeStampIfAvailable(session, djData);
-
-                var djName = djData.Text;
                 // DJ Name CAN look like this: Daybreak Session: Claptone|\r\n12:00 - 13:00
                 // We want only the Name: Claptone
                 var djNameParts = djName.Split("\r");
@@ -117,75 +92,86 @@ public class Grabber
                     djName = djNameParts[0];
                 }
 
-                session.DjName = djName.Trim();
-                Console.WriteLine(
-                    $"Stage: {session.StageName}, DJ: {session.DjName}, Start: {session.StartTime}, End: {session.EndTime}");
-                _sessions.Add(session);
+                EnumeratePerformances(performances, djName.Trim());
+                var closeButton = overlay.FindElement(By.TagName("button"));
+                closeButton.Click();
             }
         }
     }
 
-    private void ApplySessionTimeStampIfAvailable(Session session, IWebElement djData)
+    private void EnumeratePerformances(ReadOnlyCollection<IWebElement> performances, string name)
     {
-        try
+        foreach (var performance in performances)
         {
-            var timeSlot = djData.FindElement(By.TagName("span"));
-            var timeSlotParts = timeSlot.Text.Split(" - ");
-            // The date is not in the time slot, so we need to get it from the event day button. The event day button has a data-date attribute with the date
-            var date = _eventDayButtons![_selectedDay].GetAttribute("data-date");
-            // Format is: 2023/07/28
-            var dateParts = date.Split("/");
-            var endParts = dateParts.ToArray();
+            // Get the text of the h2 inside the performance. But there is also a span inside the h2, and we dont want the text of the span
+            var stageName = performance.FindElement(By.XPath(".//h2")).Text;
+            var stageNameParts = stageName.Split("\r");
+            stageName = stageNameParts[0].Trim();
+            var timeElements = performance.FindElements(By.XPath(".//div[contains(@class, '_time_')]/p"));
+            // The first element contains the day in following format: Sun Jul 28 2024 as an example
+            // The second element contains the time slot in following format: 12:00 - 13:00
+            var timeSlot = timeElements[1].Text;
+            var timeSlotParts = timeSlot.Split('-');
             var startTime = TimeSpan.Parse(timeSlotParts[0], CultureInfo.InvariantCulture);
             var endTime = TimeSpan.Parse(timeSlotParts[1], CultureInfo.InvariantCulture);
-
-            // Check if end or start time is after midnight. If so, add a day to the date
-            if (endTime < startTime)
+            var dateParts = timeElements[0].Text.Split(" ");
+            var startDate = new DateTime(int.Parse(dateParts[3]), GetMonthNumber(dateParts[1]),
+                int.Parse(dateParts[2]));
+            var session = new Session
             {
-                // End time is after midnight, so add a day to the date
-                var dateTime = new DateTime(int.Parse(endParts[0]), int.Parse(endParts[1]),
-                    int.Parse(endParts[2]));
-                dateTime = dateTime.AddDays(1);
-                endParts[0] = dateTime.Year.ToString();
-                endParts[1] = dateTime.Month.ToString();
-                endParts[2] = dateTime.Day.ToString();
-            }
+                StageName = NormalizeStageName(stageName),
+                DjName = name
+            };
+            ApplySessionTimeStampIfAvailable(session, startTime, endTime, startDate);
 
-            if (endTime >= new TimeSpan(0, 0, 0) && startTime >= new TimeSpan(0, 0, 0)
-                                                 && endTime <= new TimeSpan(2, 0, 0) &&
-                                                 startTime <= new TimeSpan(2, 0, 0))
-            {
-                // Start and end time are between 00:00 and 02:00, so add a day to both dates
-                var dateTime = new DateTime(int.Parse(endParts[0]), int.Parse(endParts[1]),
-                    int.Parse(endParts[2]));
-                dateTime = dateTime.AddDays(1);
-                endParts[0] = dateTime.Year.ToString();
-                endParts[1] = dateTime.Month.ToString();
-                endParts[2] = dateTime.Day.ToString();
-
-                dateTime = new DateTime(int.Parse(dateParts[0]), int.Parse(dateParts[1]),
-                    int.Parse(dateParts[2]));
-                dateTime = dateTime.AddDays(1);
-                dateParts[0] = dateTime.Year.ToString();
-                dateParts[1] = dateTime.Month.ToString();
-                dateParts[2] = dateTime.Day.ToString();
-            }
-
-            session.StartTime = new DateTime(int.Parse(dateParts[0]), int.Parse(dateParts[1]),
-                int.Parse(dateParts[2]), startTime.Hours, startTime.Minutes, startTime.Seconds);
-            session.EndTime = new DateTime(int.Parse(endParts[0]), int.Parse(endParts[1]),
-                int.Parse(endParts[2]), endTime.Hours, endTime.Minutes, endTime.Seconds);
+            Console.WriteLine(
+                $"Stage: {session.StageName}, DJ: {session.DjName}, Start: {session.StartTime}, End: {session.EndTime}");
+            _sessions.Add(session);
         }
-        catch (Exception e)
+    }
+
+    private string NormalizeStageName(string stageName)
+    {
+        return stageName.Replace("by Bud", "").Replace("by Coke Studio", "").Trim();
+    }
+
+    private static int GetMonthNumber(string datePart)
+    {
+        return datePart switch
         {
-            Console.WriteLine("Error applying time stamp: " + e.Message +
-                              ". Adding session without time stamp. Applying only date for now...");
-            var date = _eventDayButtons![_selectedDay].GetAttribute("data-date");
-            var dateParts = date.Split("/");
-            session.StartTime = new DateTime(int.Parse(dateParts[0]), int.Parse(dateParts[1]),
-                int.Parse(dateParts[2]));
-            session.EndTime = new DateTime(int.Parse(dateParts[0]), int.Parse(dateParts[1]),
-                int.Parse(dateParts[2]));
+            "Jan" => 1,
+            "Feb" => 2,
+            "Mar" => 3,
+            "Apr" => 4,
+            "May" => 5,
+            "Jun" => 6,
+            "Jul" => 7,
+            "Aug" => 8,
+            "Sep" => 9,
+            "Oct" => 10,
+            "Nov" => 11,
+            "Dec" => 12,
+            _ => 0
+        };
+    }
+
+    private void ApplySessionTimeStampIfAvailable(Session session, TimeSpan startTime, TimeSpan endTime,
+        DateTime startDate)
+    {
+        // Format is: 2023/07/28
+        var endDate = new DateTime(startDate.Year, startDate.Month, startDate.Day, endTime.Hours, endTime.Minutes,
+            endTime.Seconds);
+
+        // Check if end or start time is after midnight. If so, add a day to the date
+        if (endTime < startTime)
+        {
+            // End time is after midnight, so add a day to the date
+            endDate = endDate.AddDays(1);
         }
+
+        startDate = new DateTime(startDate.Year, startDate.Month, startDate.Day, startTime.Hours, startTime.Minutes,
+            startTime.Seconds);
+        session.StartTime = startDate;
+        session.EndTime = endDate;
     }
 }

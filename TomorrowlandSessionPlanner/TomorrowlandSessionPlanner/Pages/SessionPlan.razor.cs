@@ -17,6 +17,12 @@ public partial class SessionPlan : ViewModelComponent<SessionAnalyzerViewModel>
     {
         if (!firstRender) return;
         await ViewModel.CheckSessionsCommand.ExecuteAsync(null);
+        StateHasChanged();
+    }
+
+    private void SessionRemoved()
+    {
+        ViewModel.SessionsHaveChanged = true;
     }
     
     private async Task ReCheckSessions()

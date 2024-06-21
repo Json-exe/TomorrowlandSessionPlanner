@@ -8,22 +8,23 @@
                 </MudText>
             </MudChip>
         </MudGrid>
-        <MudCard Outlined="true">
-            <MudText GutterBottom="true" Typo="Typo.h6" Align="Align.Center">DJ: @PlannerManager.DjList.First(x => x.Id == OverlappingSession.Session.DjId).Name</MudText>
+        <MudCard Outlined>
+            <MudText GutterBottom Typo="Typo.h6" Align="Align.Center">DJ: @PlannerManager.DjList.First(x => x.Id == OverlappingSession.Session.DjId).Name</MudText>
             <MudText Typo="Typo.h6" Align="Align.Center">Von: @OverlappingSession.Session.StartTime (@OverlappingSession.Session.StartTime.ToString("dddd", new CultureInfo("de")))</MudText>
             <MudText Typo="Typo.h6" Align="Align.Center">Bis: @OverlappingSession.Session.EndTime (@OverlappingSession.Session.EndTime.ToString("dddd", new CultureInfo("de")))</MudText>
         </MudCard>
-        <MudText GutterBottom="true" Align="Align.Center" Typo="Typo.h6" Class="mt-2">Überlappt mit:</MudText>
-        <MudCard Outlined="true" Style="height: 150px; overflow-y: scroll;">
-            <MudList Clickable="false" Dense="true">
+        <MudText GutterBottom Align="Align.Center" Typo="Typo.h6" Class="mt-2">Überlappt mit:</MudText>
+        <MudCard Outlined Style="height: 150px; overflow-y: scroll;">
+            <MudList Clickable="false" Dense>
                 @foreach (var session in OverlappingSession.OverlappingSessions)
                 {
-                    <MudListItem Dense="true">
-                        <MudText Inline="true">@PlannerManager.StageList.First(x => x.Id == session.StageId).Name | </MudText>
-                        <MudText Inline="true">DJ: @PlannerManager.DjList.First(x => x.Id == session.DjId).Name</MudText>
+                    <MudListItem Dense>
+                        <MudText Inline>@PlannerManager.StageList.First(x => x.Id == session.StageId).Name | </MudText>
+                        <MudText Inline>DJ: @PlannerManager.DjList.First(x => x.Id == session.DjId).Name</MudText>
                         <MudIconButton Icon="@Icons.Material.Filled.Remove" Class="ml-2" Size="Size.Small"
                                        Title="Remove" Color="Color.Error" Variant="Variant.Outlined"
-                                       OnClick="@(() => RemoveUserSession(session))"/>
+                                       OnClick="@(() => RemoveUserSession(session))"
+                                       Disabled="@_hasBeenRemoved"/>
                         <MudDivider Class="mt-2" DividerType="DividerType.Middle"/>
                     </MudListItem>
                 }
@@ -33,7 +34,8 @@
     <MudCardActions>
         <MudButton Variant="Variant.Outlined" Color="Color.Error"
                    OnClick="@(() => RemoveUserSession(OverlappingSession.Session))"
-                   StartIcon="@Icons.Material.Outlined.Remove">
+                   StartIcon="@Icons.Material.Outlined.Remove"
+                   Disabled="@_hasBeenRemoved">
             Remove!
         </MudButton>
     </MudCardActions>
