@@ -9,6 +9,11 @@ public class TmldbContext : DbContext
     public virtual DbSet<Stage> Stages { get; init; } = null!;
     public virtual DbSet<Session> Sessions { get; init; } = null!;
 
+    public TmldbContext()
+    {
+        
+    }
+    
     public TmldbContext(DbContextOptions<TmldbContext> options) : base(options)
     {
     }

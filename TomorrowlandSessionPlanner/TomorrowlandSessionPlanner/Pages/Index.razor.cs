@@ -10,8 +10,8 @@ public partial class Index : ComponentBase
     private readonly List<Stage> _stageList = [];
     private readonly List<Session> _sessionList = [];
     private List<Session> _filteredSessions = [];
-    private readonly DateTime _weekend2Start = new(2023, 7, 28);
-    private readonly DateTime _weekend1Start = new(2023, 7, 21);
+    private readonly DateTime _weekend2Start = new(2024, 7, 26);
+    private readonly DateTime _weekend1Start = new(2024, 7, 19);
     private IEnumerable<Stage> _stageFilter = new List<Stage>();
     private string? _djFilter;
     private bool _loading = true;
@@ -44,7 +44,7 @@ public partial class Index : ComponentBase
             StateHasChanged();
             return;
         }
-        var dj = _djList.FirstOrDefault(x => _djFilter != null && x.Name.Equals(_djFilter, StringComparison.InvariantCultureIgnoreCase));
+        var dj = _djList.Find(x => _djFilter != null && x.Name.Equals(_djFilter, StringComparison.InvariantCultureIgnoreCase));
         // Filter by stage and dj
         if (_stageFilter.Any() && !string.IsNullOrEmpty(_djFilter))
         {

@@ -12,8 +12,10 @@
         Bitte wähle deine Sessions für das jeweilige Wochenende aus
     </MudText>
     <MudGrid Justify="Justify.Center" Class="mt-3 mb-3">
-        <MudButton Size="Size.Large" OnClick="@NavigateToSummary" Variant="Variant.Filled" Class="mt-3" 
-                   Color="Color.Info" FullWidth="false" Style="width: 200px;">Next</MudButton>
+        <MudButton Size="Size.Large" OnClick="@NavigateToSummary" Variant="Variant.Filled" Class="mt-3"
+                   Color="Color.Info" Style="width: 200px;">
+            Next
+        </MudButton>
     </MudGrid>
     <MudExpansionPanels Elevation="5" MultiExpansion="true">
         <MudExpansionPanel>
@@ -24,7 +26,7 @@
                 <MudPaper Elevation="5" Class="pa-8">
                     <MudGrid Class="mb-3" Justify="Justify.FlexStart" Style="display: flex; align-items: center;">
                         <MudItem xs="3">
-                            <MudSelect @bind-SelectedValues="@_stageFilter" MultiSelection T="Stage" 
+                            <MudSelect @bind-SelectedValues="@_stageFilter" MultiSelection T="Stage"
                                        Variant="Variant.Outlined" Label="Filter stages" Clearable
                                        ToStringFunc="ToStringFunc">
                                 @foreach (var item in _stageList)
@@ -34,7 +36,7 @@
                             </MudSelect>
                         </MudItem>
                         <MudItem xs="3">
-                            <MudAutocomplete T="string" ResetValueOnEmptyText @bind-Value="@_djFilter" Clearable 
+                            <MudAutocomplete T="string" ResetValueOnEmptyText @bind-Value="@_djFilter" Clearable
                                              Variant="Variant.Outlined" Label="Filter DJ" SearchFunc="@DjSearch"/>
                         </MudItem>
                         <MudItem xs="3">
@@ -48,13 +50,16 @@
                         }
                         else
                         {
-                            @if (!_filteredSessions.Any(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
+                            @if (!_filteredSessions.Any(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start || x.StartTime == DateTime.MinValue))
                             {
                                 <MudChip Color="Color.Info" Icon="@Icons.Material.Outlined.Dataset">No data available</MudChip>
                             }
-                            @foreach (var session in _filteredSessions.Where(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start))
+                            else
                             {
-                                <SessionCard @key="session.Id" Class="ml-5 mb-5" Session="session"/>
+                                @foreach (var session in _filteredSessions.Where(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start || x.StartTime == DateTime.MinValue))
+                                {
+                                    <SessionCard @key="session.Id" Class="ml-5 mb-5" Session="session"/>
+                                }
                             }
                         }
                     </MudGrid>
@@ -69,7 +74,7 @@
                 <MudPaper Elevation="5" Class="pa-8">
                     <MudGrid Class="mb-3" Justify="Justify.FlexStart" Style="display: flex; align-items: center;">
                         <MudItem xs="3">
-                            <MudSelect @bind-SelectedValues="@_stageFilter" MultiSelection T="Stage" 
+                            <MudSelect @bind-SelectedValues="@_stageFilter" MultiSelection T="Stage"
                                        Variant="Variant.Outlined" Label="Filter stages" Clearable ToStringFunc="ToStringFunc">
                                 @foreach (var item in _stageList)
                                 {
@@ -78,7 +83,7 @@
                             </MudSelect>
                         </MudItem>
                         <MudItem xs="3">
-                            <MudAutocomplete T="string" ResetValueOnEmptyText @bind-Value="@_djFilter" Clearable 
+                            <MudAutocomplete T="string" ResetValueOnEmptyText @bind-Value="@_djFilter" Clearable
                                              Variant="Variant.Outlined" Label="Filter DJ" SearchFunc="@DjSearch"/>
                         </MudItem>
                         <MudItem xs="3">
@@ -88,17 +93,20 @@
                     <MudGrid Spacing="2" Justify="Justify.SpaceEvenly">
                         @if (_loading)
                         {
-                            <MudProgressCircular Indeterminate="true" Size="Size.Large" Color="Color.Info"/>
+                            <MudProgressCircular Indeterminate Size="Size.Large" Color="Color.Info"/>
                         }
                         else
                         {
-                            @if (!_filteredSessions.Any(x => x.StartTime >= _weekend2Start))
+                            @if (!_filteredSessions.Any(x => x.StartTime >= _weekend2Start || x.StartTime == DateTime.MinValue))
                             {
                                 <MudChip Color="Color.Info" Icon="@Icons.Material.Outlined.Dataset">No data available</MudChip>
                             }
-                            @foreach (var session in _filteredSessions.Where(x => x.StartTime >= _weekend2Start))
+                            else
                             {
-                                <SessionCard @key="session.Id" Class="ml-5 mb-5" Session="session"/>
+                                @foreach (var session in _filteredSessions.Where(x => x.StartTime >= _weekend2Start || x.StartTime == DateTime.MinValue))
+                                {
+                                    <SessionCard @key="session.Id" Class="ml-5 mb-5" Session="session"/>
+                                }
                             }
                         }
                     </MudGrid>

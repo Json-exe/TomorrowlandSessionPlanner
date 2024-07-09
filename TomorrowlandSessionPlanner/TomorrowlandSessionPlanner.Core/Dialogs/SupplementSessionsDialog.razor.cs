@@ -2,7 +2,7 @@
 using MudBlazor;
 using TomorrowlandSessionPlanner.Core.Model;
 
-namespace TomorrowlandSessionPlanner.Dialogs;
+namespace TomorrowlandSessionPlanner.Core.Dialogs;
 
 public partial class SupplementSessionsDialog : ComponentBase
 {
@@ -12,13 +12,14 @@ public partial class SupplementSessionsDialog : ComponentBase
     [Parameter]
     public List<Session> SupplementSessions { get; set; } = [];
 
-    private readonly DateTime _weekend2Start = new(2023, 7, 28);
-    private readonly DateTime _weekend1Start = new(2023, 7, 21);
-
     private void AddSessionToUser(Session session)
     {
         PlannerManager.AddedSessions.Add(session);
-        SupplementSessions = PlannerManager.SessionList.Where(s => !PlannerManager.AddedSessions.Any(ss => IsSessionOverlapping(s, ss) && PlannerManager.AddedSessions.Any(session1 => session1.Id != s.Id))).ToList();
+        SupplementSessions =
+            PlannerManager.SessionList
+                .Where(s => !PlannerManager.AddedSessions.Exists(ads => ads.Id == s.Id))
+                .Where(s => !PlannerManager.AddedSessions.Exists(ads => IsSessionOverlapping(s, ads)))
+                .ToList();
         StateHasChanged();
     }
 

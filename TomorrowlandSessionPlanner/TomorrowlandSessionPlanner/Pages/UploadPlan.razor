@@ -1,18 +1,16 @@
 ﻿@page "/upload"
-@using TomorrowlandSessionPlanner.Core.Code
-@inject PlannerManager PlannerManager
-@inject NavigationManager NavigationManager
-@inject ISnackbar Snackbar
+@inherits ViewModelComponent<TomorrowlandSessionPlanner.Core.ViewModel.UploadPlanViewModel>
 
 <MudStack Justify="Justify.Center" Style="display: flex; align-items: center; height: 100%">
-    <MudText Align="Align.Center" GutterBottom="true" Typo="Typo.h3">Bitte Lade hier deine Plan Datei hoch!</MudText>
-    <MudPaper Outlined="true" Class="pa-8">
-        <MudFileUpload T="IBrowserFile" FilesChanged="@UploadFiles" Accept=".tmlplanner" MaximumFileCount="1" Required>
+    <MudText Align="Align.Center" GutterBottom Typo="Typo.h3">Bitte Lade hier deine Plan Datei hoch!</MudText>
+    <MudPaper Outlined Class="pa-8">
+        <MudFileUpload T="IBrowserFile" FilesChanged="UploadFileChanged" Accept=".tmlplanner" MaximumFileCount="1" Required>
             <ButtonTemplate>
                 <MudButton HtmlTag="label"
                            Variant="Variant.Filled"
                            Color="Color.Primary"
                            StartIcon="@Icons.Material.Filled.CloudUpload"
+                           Disabled="@ViewModel.UploadFileCommand.IsRunning"
                            for="@context">
                     Upload Plan
                 </MudButton>
@@ -31,7 +29,8 @@
         </MudFileUpload>
     </MudPaper>
     <MudText Align="Align.Center" Typo="Typo.h6">
-        Deine Dateien werden nicht auf unseren Servern gespeichert! Sie werden lediglich ausgelesen und verarbeitet. Kein Byte deiner Datei landet auf unserer Fesplatte.
+        Deine Dateien werden nicht auf unserem Server gespeichert! Sie werden lediglich ausgelesen und verarbeitet. 
+        Kein Byte deiner Datei landet auf unserer Fesplatte.
     </MudText>
 </MudStack>
 

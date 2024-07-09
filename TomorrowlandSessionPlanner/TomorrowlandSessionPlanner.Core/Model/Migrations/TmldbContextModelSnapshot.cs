@@ -7,7 +7,7 @@ using TomorrowlandSessionPlanner.Core.DBContext;
 
 #nullable disable
 
-namespace TomorrowlandSessionPlanner.Migrations
+namespace TomorrowlandSessionPlanner.Core.Model.Migrations
 {
     [DbContext(typeof(TmldbContext))]
     partial class TmldbContextModelSnapshot : ModelSnapshot
@@ -15,9 +15,9 @@ namespace TomorrowlandSessionPlanner.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.15");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
 
-            modelBuilder.Entity("TomorrowlandSessionPlanner.Models.Dj", b =>
+            modelBuilder.Entity("TomorrowlandSessionPlanner.Core.Model.Dj", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -32,7 +32,7 @@ namespace TomorrowlandSessionPlanner.Migrations
                     b.ToTable("Djs");
                 });
 
-            modelBuilder.Entity("TomorrowlandSessionPlanner.Models.Session", b =>
+            modelBuilder.Entity("TomorrowlandSessionPlanner.Core.Model.Session", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,7 +59,7 @@ namespace TomorrowlandSessionPlanner.Migrations
                     b.ToTable("Sessions");
                 });
 
-            modelBuilder.Entity("TomorrowlandSessionPlanner.Models.Stage", b =>
+            modelBuilder.Entity("TomorrowlandSessionPlanner.Core.Model.Stage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -74,15 +74,15 @@ namespace TomorrowlandSessionPlanner.Migrations
                     b.ToTable("Stages");
                 });
 
-            modelBuilder.Entity("TomorrowlandSessionPlanner.Models.Session", b =>
+            modelBuilder.Entity("TomorrowlandSessionPlanner.Core.Model.Session", b =>
                 {
-                    b.HasOne("TomorrowlandSessionPlanner.Models.Dj", "Dj")
+                    b.HasOne("TomorrowlandSessionPlanner.Core.Model.Dj", "Dj")
                         .WithMany("Sessions")
                         .HasForeignKey("DjId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TomorrowlandSessionPlanner.Models.Stage", "Stage")
+                    b.HasOne("TomorrowlandSessionPlanner.Core.Model.Stage", "Stage")
                         .WithMany("Sessions")
                         .HasForeignKey("StageId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -93,12 +93,12 @@ namespace TomorrowlandSessionPlanner.Migrations
                     b.Navigation("Stage");
                 });
 
-            modelBuilder.Entity("TomorrowlandSessionPlanner.Models.Dj", b =>
+            modelBuilder.Entity("TomorrowlandSessionPlanner.Core.Model.Dj", b =>
                 {
                     b.Navigation("Sessions");
                 });
 
-            modelBuilder.Entity("TomorrowlandSessionPlanner.Models.Stage", b =>
+            modelBuilder.Entity("TomorrowlandSessionPlanner.Core.Model.Stage", b =>
                 {
                     b.Navigation("Sessions");
                 });

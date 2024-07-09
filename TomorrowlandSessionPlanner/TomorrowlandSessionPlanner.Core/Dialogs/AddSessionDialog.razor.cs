@@ -2,13 +2,13 @@
 using MudBlazor;
 using TomorrowlandSessionPlanner.Core.Model;
 
-namespace TomorrowlandSessionPlanner.Dialogs;
+namespace TomorrowlandSessionPlanner.Core.Dialogs;
 
 public partial class AddSessionDialog : ComponentBase
 {
     [CascadingParameter]
     public required MudDialogInstance MudDialog { get; set; }
-
+    
     [Parameter] public List<Dj> Djs { get; set; } = [];
 
     [Parameter] public List<Stage> Stages { get; set; } = [];
@@ -29,7 +29,7 @@ public partial class AddSessionDialog : ComponentBase
     protected override void OnAfterRender(bool firstRender)
     {
         if (!firstRender) return;
-        _selectedStage = PreSelectedStage >= 0 ? PreSelectedStage : Stages.First().Id;
+        _selectedStage = PreSelectedStage >= 0 ? PreSelectedStage : Stages[0].Id;
         _startDate = PreSelectedDate;
         _endDate = PreSelectedDate;
         StateHasChanged();

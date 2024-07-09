@@ -14,10 +14,24 @@
                 DJ: @PlannerManager.DjList.First(x => x.Id == Session.DjId).Name
             </MudText>
             <MudText Typo="Typo.h6" Align="Align.Center">
-                Von: @Session.StartTime.ToString("dd.MM") (@Session.StartTime.ToString("dddd", new CultureInfo("de")))
+                @if (Session.StartTime == DateTime.MinValue)
+                {
+                    <span>Keine Start-Zeitangabe</span>
+                }
+                else
+                {
+                    <span>Von: @Session.StartTime.ToString("dd.MM") (@Session.StartTime.ToString("dddd", new CultureInfo("de")))</span>
+                }
             </MudText>
             <MudText Typo="Typo.h6" Align="Align.Center">
-                Bis: @Session.EndTime.ToString("dd.MM") (@Session.EndTime.ToString("dddd", new CultureInfo("de")))
+                @if (Session.EndTime == DateTime.MinValue)
+                {
+                    <span>Keine End-Zeitangabe</span>
+                }
+                else
+                {
+                    <span>Bis: @Session.EndTime.ToString("dd.MM") (@Session.EndTime.ToString("dddd", new CultureInfo("de")))</span>
+                }
             </MudText>
         </MudCard>
     </MudCardContent>

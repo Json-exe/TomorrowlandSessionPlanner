@@ -1,5 +1,7 @@
 ﻿@using TomorrowlandSessionPlanner.Core.Code
 @inject PlannerManager PlannerManager
+@using MudBlazor
+@using TomorrowlandSessionPlanner.Core.Model
 
 <MudDialog>
     <DialogContent>
@@ -10,7 +12,7 @@
                 </TitleContent>
                 <ChildContent>
                     <MudTable Bordered Dense Outlined Virtualize
-                        Items="SupplementSessions.Where(x => x.StartTime >= _weekend1Start && x.StartTime < _weekend2Start)">
+                              Items="@(SupplementSessions.Where(x => x.StartTime >= TomorrowlandTimeData.WeekendOneStartTime && x.StartTime < TomorrowlandTimeData.WeekendTwoStartTime))">
                         <HeaderContent>
                             <MudTh>Stage</MudTh>
                             <MudTh>DJ</MudTh>
@@ -24,7 +26,7 @@
                             <MudTd DataLabel="Start">@context.StartTime</MudTd>
                             <MudTd DataLabel="End">@context.EndTime</MudTd>
                             <MudTd DataLabel="Action">
-                                <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Text" 
+                                <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Text"
                                                Color="Color.Success" OnClick="@(() => AddSessionToUser(context))"/>
                             </MudTd>
                         </RowTemplate>
@@ -36,7 +38,7 @@
                     <MudText Align="Align.Center" Typo="Typo.h4">Weekend 2</MudText>
                 </TitleContent>
                 <ChildContent>
-                    <MudTable Items="SupplementSessions.Where(x => x.StartTime >= _weekend2Start)" Bordered 
+                    <MudTable Items="SupplementSessions.Where(x => x.StartTime >= TomorrowlandTimeData.WeekendTwoStartTime)" Bordered
                               Dense Outlined Virtualize>
                         <HeaderContent>
                             <MudTh>Stage</MudTh>
@@ -51,7 +53,7 @@
                             <MudTd DataLabel="Start">@context.StartTime</MudTd>
                             <MudTd DataLabel="End">@context.EndTime</MudTd>
                             <MudTd DataLabel="Action">
-                                <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Text" 
+                                <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Text"
                                                Color="Color.Success" OnClick="@(() => AddSessionToUser(context))"/>
                             </MudTd>
                         </RowTemplate>

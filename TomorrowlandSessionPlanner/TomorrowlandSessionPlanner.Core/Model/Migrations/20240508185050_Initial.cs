@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace TomorrowlandSessionPlanner.Migrations
+namespace TomorrowlandSessionPlanner.Core.Model.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
